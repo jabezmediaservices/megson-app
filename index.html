@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Megson Plastering Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --megson-blue: #003366; --megson-orange: #f39c12; }
+        .bg-megson-blue { background-color: var(--megson-blue); }
+        .text-megson-blue { color: var(--megson-blue); }
+        .border-megson-orange { border-color: var(--megson-orange); }
+        input[type="range"]::-webkit-slider-thumb { background: var(--megson-orange); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans pb-24">
+
+    <div id="auth-screen" class="fixed inset-0 bg-megson-blue z-50 flex flex-col items-center justify-center p-6 text-white">
+        <h1 class="text-3xl font-bold mb-8">MEGSON PLASTERING</h1>
+        <div id="setup-pass" class="hidden w-full max-w-xs text-center">
+            <p class="mb-4 text-sm">Create your app password:</p>
+            <input type="password" id="new-pw" class="w-full p-4 rounded text-black mb-4" placeholder="e.g. 1234">
+            <button onclick="setInitialPassword()" class="w-full bg-orange-500 p-4 rounded-xl font-bold">Set Password</button>
+        </div>
+        <div id="login-pass" class="hidden w-full max-w-xs text-center">
+            <input type="password" id="login-pw" class="w-full p-4 rounded text-black mb-4" placeholder="Enter Password">
+            <button onclick="checkPassword()" class="w-full bg-orange-500 p-4 rounded-xl font-bold shadow-lg">Unlock Hub</button>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden">
+        <header class="bg-megson-blue text-white p-5 shadow-lg sticky top-0 z-40 flex justify-between items-center">
+            <span class="font-bold tracking-tight">MEGSON HUB</span>
+            <button onclick="showSection('settings')" class="text-xs bg-white/10 px-3 py-2 rounded-lg">Settings</button>
+        </header>
+
+        <section id="sec-jobs" class="p-4 space-y-4">
+            <h2 class="text-xl font-bold text-megson-blue">Project Pipeline</h2>
+            <div id="job-list-container" class="space-y-3">
+                </div>
+        </section>
+
+        <section id="sec-add-job" class="p-4 hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-megson-blue">
+                <h2 class="text-xl font-bold mb-4 text-megson-blue">New Project</h2>
+                <input type="text" id="client-name" placeholder="Client Name" class="w-full border p-4 rounded-xl mb-3">
+                <input type="text" id="client-address" placeholder="Job Site Address" class="w-full border p-4 rounded-xl mb-3">
+                <select id="job-status" class="w-full border p-4 rounded-xl mb-6">
+                    <option value="Pending">Status: Pending</option>
+                    <option value="Active">Status: Active</option>
+                    <option value="Completed">Status: Completed</option>
+                </select>
+                <button onclick="saveJob()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-bold">Create Job Card</button>
+            </div>
+        </section>
+
+        <section id="sec-estimator" class="p-4 hidden space-y-4">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-megson-blue">
+                <h2 class="text-xl font-bold text-megson-blue mb-4">Materials Estimator</h2>
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <div><label class="text-[10px] font-bold text-gray-400">L (m)</label><input type="number" id="est-L" class="w-full border p-2 rounded" oninput="calculateEstimate()"></div>
+                    <div><label class="text-[10px] font-bold text-gray-400">W (m)</label><input type="number" id="est-W" class="w-full border p-2 rounded" oninput="calculateEstimate()"></div>
+                    <div><label class="text-[10px] font-bold text-gray-400">H (m)</label><input type="number" id="est-H" class="w-full border p-2 rounded" oninput="calculateEstimate()"></div>
+                </div>
+                <div class="flex items-center gap-4 mb-4 text-sm">
+                    <label class="flex items-center gap-2 font-medium"><input type="checkbox" id="est-ceiling" onchange="calculateEstimate()"> Ceiling?</label>
+                    <input type="number" id="est-deduct" placeholder="Deduct m² (Doors)" class="border p-2 w-full rounded text-sm" oninput="calculateEstimate()">
+                </div>
+                <select id="est-material" class="w-full border p-4 rounded-xl mb-4 bg-gray-50" onchange="calculateEstimate()">
+                    <option value="MultiFinish">MultiFinish (10m² coverage)</option>
+                    <option value="Bonding">Bonding (3m² coverage)</option>
+                    <option value="Hardwall">Hardwall (3m² coverage)</option>
+                </select>
+                <div class="mb-6">
+                    <label class="text-xs text-gray-500 font-bold uppercase">Waste: <span id="waste-val">10</span>%</label>
+                    <input type="range" id="est-waste" min="0" max="25" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500" oninput="updateWasteLabel(this.value)">
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="flex justify-between font-bold text-lg text-megson-blue"><span>Bags Required:</span><span id="res-bags">0</span></div>
+                    <div class="flex justify-between text-sm text-gray-600"><span>Est. Cost:</span><span id="res-cost">£0.00</span></div>
+                    <button onclick="saveEstimateToQuote()" class="w-full mt-4 bg-orange-500 text-white p-4 rounded-xl font-bold shadow-md">Apply to Quote →</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-quote" class="p-4 hidden space-y-4">
+            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-orange-500">
+                <h2 class="text-xl font-bold text-megson-blue mb-4">Quote Builder</h2>
+                <div class="bg-gray-50 p-4 rounded-xl mb-4 border-l-4 border-gray-300">
+                    <p class="text-[10px] text-gray-500 font-bold tracking-widest uppercase">Materials Included</p>
+                    <p id="quote-material-summary" class="font-bold text-sm text-gray-700 italic">No materials applied yet...</p>
+                </div>
+                <div><label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Labour Charge (£)</label><input type="number" id="quote-labour" placeholder="e.g. 500" class="w-full border p-4 rounded-xl" oninput="calculateFinalQuote()"></div>
+                <div><label class="block text-[10px] font-bold text-gray-400 uppercase mt-4 mb-1">Extras / Sundries (£)</label><input type="number" id="quote-extras" placeholder="e.g. 50" class="w-full border p-4 rounded-xl" oninput="calculateFinalQuote()"></div>
+                <div class="flex items-center justify-between p-4 border rounded-xl bg-gray-50 mt-4">
+                    <span class="font-bold text-sm">Add 20% VAT</span>
+                    <input type="checkbox" id="quote-vat" class="w-6 h-6 accent-megson-blue" onchange="calculateFinalQuote()">
+                </div>
+                <div class="bg-megson-blue text-white p-6 rounded-2xl shadow-inner mt-6">
+                    <div class="flex justify-between text-xs opacity-70"><span>Subtotal</span><span id="final-subtotal">£0.00</span></div>
+                    <div class="flex justify-between text-xs opacity-70"><span>VAT (20%)</span><span id="final-vat">£0.00</span></div>
+                    <div class="flex justify-between text-2xl font-bold mt-2 pt-2 border-t border-white/20"><span>Total</span><span id="final-total">£0.00</span></div>
+                </div>
+                <button onclick="finalizeAndSaveQuote()" class="w-full mt-6 bg-green-600 text-white p-4 rounded-2xl font-bold shadow-lg">💾 Save Quote to Job</button>
+            </div>
+        </section>
+
+        <section id="sec-settings" class="p-4 hidden">
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-xl font-bold mb-4">Brand Settings</h2>
+                <button onclick="localStorage.clear(); location.reload();" class="text-red-500 text-xs font-bold uppercase">Reset App Data</button>
+            </div>
+        </section>
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+            <button onclick="showSection('jobs')" class="flex flex-col items-center text-[10px] text-megson-blue font-bold">
+                <span class="text-xl">📁</span> Jobs
+            </button>
+            <button onclick="showSection('add-job')" class="flex flex-col items-center text-[10px] text-gray-400">
+                <span class="text-xl">➕</span> Add
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        let appState = {
+            password: null,
+            jobs: [],
+            pricing: { "MultiFinish": { coverage: 10, price: 8.50 }, "Bonding": { coverage: 3, price: 12.00 }, "Hardwall": { coverage: 3, price: 11.50 } }
+        };
+        let currentMaterialCost = 0;
+        let activeJobId = null;
+
+        // --- APP INITIALIZATION ---
+        function init() {
+            const saved = localStorage.getItem('megson_data');
+            if(saved) {
+                appState = JSON.parse(saved);
+                document.getElementById('login-pass').classList.remove('hidden');
+            } else {
+                document.getElementById('setup-pass').classList.remove('hidden');
+            }
+        }
+
+        // --- AUTHENTICATION ---
+        function setInitialPassword() {
+            const pw = document.getElementById('new-pw').value;
+            if(!pw) return alert("Please enter a password");
+            appState.password = btoa(pw);
+            saveToStorage();
+            location.reload();
+        }
+        function checkPassword() {
+            const input = document.getElementById('login-pw').value;
+            if(btoa(input) === appState.password) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+                renderJobs();
+            } else { alert("Incorrect password"); }
+        }
+
+        // --- NAVIGATION ---
+        function showSection(id) {
+            const sections = ['jobs', 'add-job', 'estimator', 'quote', 'settings'];
+            sections.forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+            document.getElementById('sec-' + id).classList.remove('hidden');
+        }
+
+        // --- JOB MANAGEMENT ---
+        function saveJob() {
+            const newJob = {
+                id: Date.now(),
+                client: document.getElementById('client-name').value,
+                address: document.getElementById('client-address').value,
+                status: document.getElementById('job-status').value,
+                quote: null
+            };
+            appState.jobs.push(newJob);
+            saveToStorage();
+            showSection('jobs');
+            renderJobs();
+        }
+
+        function renderJobs() {
+            const container = document.getElementById('job-list-container');
+            if (appState.jobs.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">No jobs. Tap 'Add' to start.</p>`;
+                return;
+            }
+            container.innerHTML = appState.jobs.map(job => `
+                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 ${job.status === 'Active' ? 'border-blue-500' : 'border-gray-300'}">
+                    <div class="flex justify-between items-start">
+                        <div><h3 class="font-bold text-gray-800">${job.client}</h3><p class="text-[10px] text-gray-500">${job.address}</p></div>
+                        <span class="text-[8px] px-2 py-1 rounded-full bg-gray-100 font-bold uppercase">${job.status}</span>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center border-t pt-4">
+                        <span class="text-xs font-bold text-megson-blue">${job.quote ? '£'+job.quote.total : 'Not Quoted'}</span>
+                        <button onclick="startQuoting(${job.id})" class="bg-megson-blue text-white text-[10px] px-4 py-2 rounded-lg font-bold">Manage Quote</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- LINKING LOGIC ---
+        function startQuoting(jobId) {
+            activeJobId = jobId;
+            showSection('estimator');
+        }
+
+        // --- ESTIMATOR ENGINE ---
+        function updateWasteLabel(val) {
+            document.getElementById('waste-val').innerText = val;
+            calculateEstimate();
+        }
+        function calculateEstimate() {
+            const L = parseFloat(document.getElementById('est-L').value) || 0;
+            const W = parseFloat(document.getElementById('est-W').value) || 0;
+            const H = parseFloat(document.getElementById('est-H').value) || 0;
+            const ceiling = document.getElementById('est-ceiling').checked;
+            const deduct = parseFloat(document.getElementById('est-deduct').value) || 0;
+            const matKey = document.getElementById('est-material').value;
+            const waste = parseFloat(document.getElementById('est-waste').value) / 100;
+
+            let area = (2 * (L + W) * H) + (ceiling ? (L * W) : 0) - deduct;
+            const spec = appState.pricing[matKey];
+            const bags = Math.ceil((area * (1 + waste)) / spec.coverage);
+            currentMaterialCost = bags * spec.price;
+
+            document.getElementById('res-bags').innerText = bags;
+            document.getElementById('res-cost').innerText = `£${currentMaterialCost.toFixed(2)}`;
+        }
+
+        function saveEstimateToQuote() {
+            const bags = document.getElementById('res-bags').innerText;
+            const cost = document.getElementById('res-cost').innerText;
+            document.getElementById('quote-material-summary').innerText = `${bags} Bags used (${cost})`;
+            showSection('quote');
+            calculateFinalQuote();
+        }
+
+        // --- QUOTE BUILDER ---
+        function calculateFinalQuote() {
+            const lab = parseFloat(document.getElementById('quote-labour').value) || 0;
+            const ext = parseFloat(document.getElementById('quote-extras').value) || 0;
+            const vatOn = document.getElementById('quote-vat').checked;
+            const sub = currentMaterialCost + lab + ext;
+            const vat = vatOn ? (sub * 0.20) : 0;
+            document.getElementById('final-subtotal').innerText = `£${sub.toFixed(2)}`;
+            document.getElementById('final-vat').innerText = `£${vat.toFixed(2)}`;
+            document.getElementById('final-total').innerText = `£${(sub + vat).toFixed(2)}`;
+        }
+
+        function finalizeAndSaveQuote() {
+            const total = document.getElementById('final-total').innerText.replace('£', '');
+            const jobIndex = appState.jobs.findIndex(j => j.id === activeJobId);
+            appState.jobs[jobIndex].quote = { total: total };
+            saveToStorage();
+            showSection('jobs');
+            renderJobs();
+            alert("Quote saved to Job!");
+        }
+
+        function saveToStorage() { localStorage.setItem('megson_data', JSON.stringify(appState)); }
+
+        init();
+    </script>
+</body>
+</html>
