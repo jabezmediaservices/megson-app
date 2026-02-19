@@ -107,10 +107,19 @@
         </section>
 
         <section id="sec-settings" class="p-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md">
-                <h2 class="text-xl font-bold mb-4">Brand Settings</h2>
-                <button onclick="localStorage.clear(); location.reload();" class="text-red-500 text-xs font-bold uppercase">Reset App Data</button>
-            </div>
+           <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-xl font-bold mb-4 text-megson-blue">App Settings</h2>
+    
+    <div class="mb-6">
+        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Company Logo</label>
+        <input type="file" id="logo-input" accept="image/*" onchange="handleLogoUpload(this)" class="text-xs">
+        <div id="logo-preview" class="mt-2 h-20 w-full border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center overflow-hidden">
+            <p class="text-[10px] text-gray-400">No logo uploaded</p>
+        </div>
+    </div>
+
+    <button onclick="localStorage.clear(); location.reload();" class="w-full bg-gray-100 text-red-500 py-3 rounded-xl text-xs font-bold uppercase">Reset App Data</button>
+</div>
         </section>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
@@ -184,24 +193,30 @@
         }
 
         function renderJobs() {
-            const container = document.getElementById('job-list-container');
-            if (appState.jobs.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-400 py-10">No jobs. Tap 'Add' to start.</p>`;
-                return;
-            }
-            container.innerHTML = appState.jobs.map(job => `
-                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 ${job.status === 'Active' ? 'border-blue-500' : 'border-gray-300'}">
-                    <div class="flex justify-between items-start">
-                        <div><h3 class="font-bold text-gray-800">${job.client}</h3><p class="text-[10px] text-gray-500">${job.address}</p></div>
-                        <span class="text-[8px] px-2 py-1 rounded-full bg-gray-100 font-bold uppercase">${job.status}</span>
-                    </div>
-                    <div class="mt-4 flex justify-between items-center border-t pt-4">
-                        <span class="text-xs font-bold text-megson-blue">${job.quote ? '£'+job.quote.total : 'Not Quoted'}</span>
-                        <button onclick="startQuoting(${job.id})" class="bg-megson-blue text-white text-[10px] px-4 py-2 rounded-lg font-bold">Manage Quote</button>
-                    </div>
+    const container = document.getElementById('job-list-container');
+    if (appState.jobs.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-400 py-10">No jobs. Tap 'Add' to start.</p>`;
+        return;
+    }
+    container.innerHTML = appState.jobs.map(job => `
+        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 ${job.status === 'Active' ? 'border-blue-500' : 'border-gray-300'}">
+            <div class="flex justify-between items-start">
+                <div><h3 class="font-bold text-gray-800">${job.client}</h3><p class="text-[10px] text-gray-500">${job.address}</p></div>
+                <span class="text-[8px] px-2 py-1 rounded-full bg-gray-100 font-bold uppercase">${job.status}</span>
+            </div>
+            <div class="mt-4 flex justify-between items-center border-t pt-4">
+                <div>
+                    <span class="text-[10px] text-gray-400 block uppercase font-bold">Total Quote</span>
+                    <span class="text-sm font-bold text-megson-blue">${job.quote ? '£'+job.quote.total : 'Not Quoted'}</span>
                 </div>
-            `).join('');
-        }
+                <div class="flex gap-2">
+                    ${job.quote ? `<button onclick="downloadPDF(${job.id})" class="bg-orange-500 text-white text-[10px] px-3 py-2 rounded-lg font-bold">📄 PDF</button>` : ''}
+                    <button onclick="startQuoting(${job.id})" class="bg-megson-blue text-white text-[10px] px-3 py-2 rounded-lg font-bold">Edit</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
 
         // --- LINKING LOGIC ---
         function startQuoting(jobId) {
@@ -264,6 +279,83 @@
 
         function saveToStorage() { localStorage.setItem('megson_data', JSON.stringify(appState)); }
 
+        // --- LOGO HANDLING ---
+function handleLogoUpload(input) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        appState.logo = e.target.result; // Saves as Base64 string
+        saveToStorage();
+        updateLogoPreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+function updateLogoPreview() {
+    if(appState.logo) {
+        document.getElementById('logo-preview').innerHTML = `<img src="${appState.logo}" class="h-full object-contain">`;
+    }
+}
+
+// --- PDF GENERATOR ---
+async function downloadPDF(jobId) {
+    const job = appState.jobs.find(j => j.id === jobId);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // 1. Add Logo if exists
+    if(appState.logo) {
+        doc.addImage(appState.logo, 'JPEG', 150, 10, 40, 40);
+    }
+
+    // 2. Header
+    doc.setFontSize(22);
+    doc.setTextColor(0, 51, 102); // Megson Blue
+    doc.text("QUOTE", 20, 30);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Megson Plastering", 20, 40);
+    doc.text(`Date: ${job.quote.date}`, 20, 45);
+
+    // 3. Client Details
+    doc.setDrawColor(243, 156, 18); // Megson Orange
+    doc.line(20, 55, 190, 55);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text("TO:", 20, 65);
+    doc.setFontSize(14);
+    doc.text(job.client, 20, 72);
+    doc.setFontSize(10);
+    doc.text(job.address, 20, 78);
+
+    // 4. Pricing Table
+    doc.setFillColor(245, 245, 245);
+    doc.rect(20, 90, 170, 10, 'F');
+    doc.setFontSize(10);
+    doc.text("Description", 25, 96);
+    doc.text("Total", 170, 96);
+
+    doc.text("Professional Plastering Services", 25, 110);
+    doc.text(`£${job.quote.total}`, 170, 110);
+
+    // 5. Grand Totals
+    doc.line(130, 130, 190, 130);
+    doc.setFontSize(12);
+    doc.text("Grand Total:", 130, 140);
+    doc.setFontSize(16);
+    doc.setTextColor(0, 51, 102);
+    doc.text(`£${job.quote.total}`, 160, 140);
+
+    // 6. Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text("Thank you for choosing Megson Plastering.", 105, 280, { align: "center" });
+
+    // Save File
+    doc.save(`Megson_Quote_${job.client.replace(/\s+/g, '_')}.pdf`);
+}
         init();
     </script>
 </body>
