@@ -14,23 +14,27 @@
     <style>
         :root { --megson-blue: #003366; --megson-orange: #f39c12; }
         .bg-megson-blue { background-color: var(--megson-blue); }
+        .text-megson-blue { color: var(--megson-blue); }
         .tab-btn.active { color: var(--megson-orange); border-top: 4px solid var(--megson-orange); }
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
-        .logo-img { height: 50px; width: auto; object-fit: contain; }
+        #add-modal, #edit-modal { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-32">
 
     <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-24">
         <div class="flex items-center gap-3">
-            <div id="header-logo-container"></div>
             <div class="flex flex-col">
                 <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
-                <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">PRO SYNC</span>
+                <span id="sync-indicator" class="text-[10px] font-bold text-red-400 mt-1 uppercase">Cloud Offline</span>
             </div>
         </div>
-        <button onclick="showSection('settings')" id="profile-pic" class="w-12 h-12 rounded-full border-2 border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-xl">👤</button>
+        <button onclick="showSection('settings')" id="profile-btn" class="w-12 h-12 rounded-full border-2 border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-xl">👤</button>
     </header>
+
+    <div class="p-4 bg-white shadow-sm border-b">
+        <input type="text" id="search-bar" oninput="renderJobs()" placeholder="🔍 Search clients or postcodes..." class="w-full p-3 rounded-xl border bg-gray-50 text-sm mb-3">
+    </div>
 
     <section id="sec-jobs" class="p-4 space-y-4">
         <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mb-2">➕ New Project</button>
@@ -39,64 +43,82 @@
 
     <section id="sec-settings" class="p-4 hidden">
         <div class="bg-white p-6 rounded-3xl shadow-md space-y-6">
-            <h2 class="text-xl font-black text-megson-blue uppercase italic">Cloud Profile</h2>
+            <h2 class="text-xl font-black text-megson-blue uppercase italic">User Profile</h2>
             
             <div id="login-area">
                 <button onclick="googleLogin()" class="w-full border-2 border-gray-200 p-4 rounded-2xl flex items-center justify-center gap-3 font-bold">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" width="20"> Sign in with Google
                 </button>
+                <p class="text-[10px] text-center mt-2 text-gray-400 uppercase font-bold">Sign in to sync data across all devices</p>
             </div>
 
             <div id="user-info" class="hidden">
-                <div class="flex items-center gap-3 p-2 bg-blue-50 rounded-2xl mb-4">
-                    <img id="user-avatar" class="w-10 h-10 rounded-full">
+                <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                    <img id="user-avatar" class="w-12 h-12 rounded-full border-2 border-white">
                     <div>
-                        <p id="user-name" class="font-bold text-sm"></p>
-                        <p class="text-[10px] text-blue-500 font-black uppercase">Cloud Synced ✅</p>
+                        <p id="user-name" class="font-bold text-sm text-megson-blue"></p>
+                        <p class="text-[10px] text-green-600 font-black uppercase">Cloud Sync Active ✅</p>
                     </div>
-                    <button onclick="auth.signOut()" class="ml-auto text-[10px] font-bold text-red-500">Sign Out</button>
+                    <button onclick="auth.signOut()" class="ml-auto text-[10px] font-bold text-red-500 uppercase">Sign Out</button>
                 </div>
             </div>
 
             <hr>
             <h2 class="text-xl font-black text-megson-blue uppercase italic">Invoice Setup</h2>
             <div class="space-y-3">
-                <input type="text" id="biz-name" oninput="updateProfile()" placeholder="Business Name" class="w-full border p-4 rounded-2xl">
-                <input type="text" id="user-bank" oninput="updateProfile()" placeholder="Bank Details (Acc/Sort)" class="w-full border p-4 rounded-2xl">
+                <label class="text-[10px] font-black uppercase text-gray-400">Trading Name</label>
+                <input type="text" id="biz-name" oninput="updateProfile()" class="w-full border p-4 rounded-2xl" placeholder="Megson Plastering">
+                <label class="text-[10px] font-black uppercase text-gray-400">Payment Details</label>
+                <input type="text" id="user-bank" oninput="updateProfile()" class="w-full border p-4 rounded-2xl" placeholder="Bank Name / Acc / Sort Code">
             </div>
         </div>
     </section>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 h-24">
         <button onclick="showSection('jobs')" class="tab-btn active flex flex-col items-center text-[10px] font-black uppercase"><span class="text-3xl">📁</span>Jobs</button>
-        <button onclick="showSection('settings')" class="tab-btn flex flex-col items-center text-[10px] font-black uppercase text-gray-400"><span class="text-3xl">⚙️</span>Profile</button>
+        <button onclick="showSection('settings')" class="tab-btn flex flex-col items-center text-[10px] font-black uppercase text-gray-400"><span class="text-3xl">👤</span>Profile</button>
     </nav>
 
-    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-3">
+    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
-            <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
-            <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
-            <input type="text" id="new-city" class="w-full border p-3 rounded-xl text-sm" placeholder="Town/City">
-            <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
-            <div class="grid grid-cols-2 gap-2">
-                <div class="text-[10px] font-bold uppercase text-gray-400">Start Date<input type="date" id="new-start" class="w-full border p-3 rounded-xl text-sm text-black"></div>
-                <div class="text-[10px] font-bold uppercase text-gray-400">End Date<input type="date" id="new-end" class="w-full border p-3 rounded-xl text-sm text-black"></div>
+            <input type="text" id="new-client" class="w-full border p-4 rounded-xl font-bold" placeholder="Client Name">
+            
+            <div class="space-y-2">
+                <p class="text-[10px] font-black text-gray-400 uppercase">Address Lines</p>
+                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
+                <input type="text" id="new-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 2">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="new-city" class="border p-3 rounded-xl text-sm" placeholder="Town/City">
+                    <input type="text" id="new-postcode" class="border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+                </div>
             </div>
-            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Save to Cloud</button>
-            <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase">Start Date</p>
+                    <input type="date" id="new-start" class="w-full border p-3 rounded-xl text-sm">
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase">End Date</p>
+                    <input type="date" id="new-end" class="w-full border p-3 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mt-4">Save to Cloud</button>
+            <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold py-2">Cancel</button>
         </div>
     </div>
 
     <script>
-        // PASTE YOUR FIREBASE CONFIG HERE
+        // --- YOUR FIREBASE CONFIG ---
         const firebaseConfig = {
-            apiKey: "PASTE_HERE",
-            authDomain: "PASTE_HERE",
-            projectId: "PASTE_HERE",
-            storageBucket: "PASTE_HERE",
-            messagingSenderId: "PASTE_HERE",
-            appId: "PASTE_HERE"
+            apiKey: "AIzaSyDyEkmbLWzQFSsdiflMnDZ5qjdntiCpLPE",
+            authDomain: "megson-plastering-56218.firebaseapp.com",
+            projectId: "megson-plastering-56218",
+            storageBucket: "megson-plastering-56218.firebasestorage.app",
+            messagingSenderId: "861097926145",
+            appId: "1:861097926145:web:5a60d601818a4978d7aa00"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -105,17 +127,21 @@
 
         let appState = { jobs: [], profile: { bizName: "Megson Plastering", bank: "" } };
 
-        // AUTH LOGIC
+        // --- AUTH & SYNC ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('login-area').classList.add('hidden');
                 document.getElementById('user-info').classList.remove('hidden');
                 document.getElementById('user-name').innerText = user.displayName;
                 document.getElementById('user-avatar').src = user.photoURL;
+                document.getElementById('sync-indicator').innerText = "Cloud Synced";
+                document.getElementById('sync-indicator').classList.replace('text-red-400', 'text-green-400');
                 loadFromCloud(user.uid);
             } else {
                 document.getElementById('login-area').classList.remove('hidden');
                 document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('sync-indicator').innerText = "Cloud Offline";
+                document.getElementById('sync-indicator').classList.replace('text-green-400', 'text-red-400');
             }
         });
 
@@ -131,53 +157,99 @@
 
         async function loadFromCloud(uid) {
             const doc = await db.collection("users").doc(uid).get();
-            if (doc.exists) { appState = doc.data(); renderJobs(); }
+            if (doc.exists) { 
+                appState = doc.data(); 
+                document.getElementById('biz-name').value = appState.profile.bizName || "";
+                document.getElementById('user-bank').value = appState.profile.bank || "";
+                renderJobs(); 
+            }
         }
 
+        // --- JOB LOGIC ---
         function createNewJob() {
             const name = document.getElementById('new-client').value;
-            const start = document.getElementById('new-start').value;
-            const end = document.getElementById('new-end').value;
-            
+            if(!name) return alert("Please enter client name");
+
             appState.jobs.push({
                 id: Date.now(),
                 client: name,
                 addr1: document.getElementById('new-addr1').value,
+                addr2: document.getElementById('new-addr2').value,
                 city: document.getElementById('new-city').value,
                 postcode: document.getElementById('new-postcode').value,
-                dateFrom: start,
-                dateTo: end,
+                dateFrom: document.getElementById('new-start').value,
+                dateTo: document.getElementById('new-end').value,
                 status: "Pending",
                 value: 0
             });
-            saveToCloud(); renderJobs(); closeModal('add-modal');
+
+            saveToCloud();
+            renderJobs();
+            closeModal('add-modal');
+            clearAddForm();
         }
 
         function calculateDuration(start, end) {
-            if(!start || !end) return "TBC";
-            const diff = Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
-            return diff + " Days";
+            if(!start || !end) return "Duration TBC";
+            const s = new Date(start);
+            const e = new Date(end);
+            const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+            return diff > 0 ? `${diff} Day${diff > 1 ? 's' : ''}` : "Invalid Dates";
         }
 
         function renderJobs() {
             const container = document.getElementById('job-list-container');
-            container.innerHTML = appState.jobs.map(job => `
-                <div class="bg-white p-6 rounded-3xl shadow-sm border-l-[12px] border-gray-300">
-                    <h3 class="font-black uppercase text-lg">${job.client}</h3>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
-                    <div class="flex gap-2 my-2">
-                        <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded-lg text-[9px] font-black uppercase">Duration: ${calculateDuration(job.dateFrom, job.dateTo)}</span>
-                        <span class="bg-orange-50 text-orange-600 px-2 py-1 rounded-lg text-[9px] font-black uppercase">Quote: £${job.value}</span>
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            
+            const filtered = appState.jobs.filter(job => 
+                job.client.toLowerCase().includes(searchTerm) || 
+                job.postcode.toLowerCase().includes(searchTerm)
+            );
+
+            container.innerHTML = filtered.map(job => `
+                <div class="bg-white p-5 rounded-3xl shadow-sm border-l-[12px] border-gray-300">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-black uppercase text-lg text-megson-blue">${job.client}</h3>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
+                        </div>
+                        <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <div class="bg-blue-50 p-2 px-3 rounded-xl">
+                            <p class="text-[8px] font-black text-blue-400 uppercase">Duration</p>
+                            <p class="text-xs font-black text-blue-700">${calculateDuration(job.dateFrom, job.dateTo)}</p>
+                        </div>
+                        <div class="bg-orange-50 p-2 px-3 rounded-xl">
+                            <p class="text-[8px] font-black text-orange-400 uppercase">Start Date</p>
+                            <p class="text-xs font-black text-orange-700">${job.dateFrom || 'TBC'}</p>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
-        function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        // --- UI HELPERS ---
         function showSection(id) {
             ['jobs', 'settings'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
             document.getElementById('sec-' + id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-megson-blue'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        
+        function clearAddForm() {
+            ['new-client', 'new-addr1', 'new-addr2', 'new-city', 'new-postcode', 'new-start', 'new-end'].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+        }
+
+        function updateProfile() {
+            appState.profile.bizName = document.getElementById('biz-name').value;
+            appState.profile.bank = document.getElementById('user-bank').value;
+            saveToCloud();
         }
     </script>
 </body>
