@@ -24,7 +24,7 @@
         <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-24">
             <div class="flex items-center gap-3">
                 <div id="header-logo-container">
-                    <img src="https://lh3.googleusercontent.com/d/1yvG5nEIdaDtjanVHDJR5hSa0sH3UzV41" class="logo-img" alt="Megson Logo">
+                    <img src="https://drive.google.com/uc?export=view&id=1yvG5nEIdaDtjanVHDJR5hSa0sH3UzV41" class="logo-img" alt="Logo">
                 </div>
                 <div class="flex flex-col">
                     <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
@@ -50,7 +50,7 @@
 
         <section id="sec-pro-calc" class="p-4 hidden pb-10">
             <div class="bg-white p-6 rounded-3xl shadow-md border-t-8 border-megson-blue">
-                <h2 class="text-xl font-black text-megson-blue uppercase italic mb-1">Room Calculator</h2>
+                <h2 class="text-xl font-black text-megson-blue uppercase italic mb-1">Room Estimator</h2>
                 <div class="grid grid-cols-3 gap-3 my-6">
                     <div class="text-center"><label class="text-[9px] text-gray-400 font-bold block mb-1">L (m)</label><input type="number" id="pro-L" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
                     <div class="text-center"><label class="text-[9px] text-gray-400 font-bold block mb-1">W (m)</label><input type="number" id="pro-W" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
@@ -58,7 +58,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-6 rounded-3xl text-center border-b-4 border-blue-200">
-                        <span class="text-[10px] uppercase font-black text-blue-400">Boards Needed</span>
+                        <span class="text-[10px] uppercase font-black text-blue-400">Boards</span>
                         <div id="res-boards" class="text-4xl font-black text-megson-blue">0</div>
                     </div>
                     <div class="bg-orange-50 p-6 rounded-3xl text-center border-b-4 border-orange-200">
@@ -71,30 +71,29 @@
 
         <section id="sec-settings" class="p-4 hidden pb-24">
             <div class="bg-white p-6 rounded-3xl shadow-md space-y-6">
+                <h2 class="text-xl font-black text-megson-blue uppercase italic">Material Rates</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-3 rounded-xl">
+                        <label class="text-[9px] font-black uppercase text-gray-400">Multi-Finish £</label>
+                        <input type="number" id="rate-bag" oninput="updateRates()" class="w-full bg-transparent font-bold">
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-xl">
+                        <label class="text-[9px] font-black uppercase text-gray-400">Board £</label>
+                        <input type="number" id="rate-board" oninput="updateRates()" class="w-full bg-transparent font-bold">
+                    </div>
+                </div>
+                <hr>
                 <h2 class="text-xl font-black text-megson-blue uppercase italic">Business Setup</h2>
                 <div class="space-y-3">
-                    <label class="text-[10px] font-black uppercase text-gray-400">Trading Name</label>
-                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="e.g. Megson Plastering" class="w-full border p-4 rounded-2xl">
-                    
-                    <label class="text-[10px] font-black uppercase text-gray-400">Full Name (For Payments)</label>
-                    <input type="text" id="user-real-name" oninput="updateProfile()" placeholder="e.g. Paul Megson" class="w-full border p-4 rounded-2xl">
-                    
+                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="Business Name" class="w-full border p-4 rounded-2xl">
+                    <input type="text" id="user-real-name" oninput="updateProfile()" placeholder="Your Name (for bank)" class="w-full border p-4 rounded-2xl">
                     <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-gray-400">Account Number</label>
-                            <input type="text" id="user-acc" oninput="updateProfile()" placeholder="12345678" class="w-full border p-4 rounded-2xl">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-gray-400">Sort Code</label>
-                            <input type="text" id="user-sort" oninput="updateProfile()" placeholder="00-00-00" class="w-full border p-4 rounded-2xl">
-                        </div>
+                        <input type="text" id="user-acc" oninput="updateProfile()" placeholder="Account No" class="border p-4 rounded-2xl">
+                        <input type="text" id="user-sort" oninput="updateProfile()" placeholder="Sort Code" class="border p-4 rounded-2xl">
                     </div>
-
-                    <label class="text-[10px] font-black uppercase text-gray-400">Contact Details</label>
-                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
-                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
+                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Business Phone" class="w-full border p-4 rounded-2xl">
+                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Business Email" class="w-full border p-4 rounded-2xl">
                 </div>
-                
                 <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
         </section>
@@ -107,14 +106,17 @@
     </div>
 
     <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
             <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
-            <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address">
-            <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+            <div class="space-y-2">
+                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
+                <input type="text" id="new-city" class="w-full border p-3 rounded-xl text-sm" placeholder="Town/City">
+                <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+            </div>
             <div class="grid grid-cols-2 gap-2">
-                <input type="date" id="new-start" class="w-full border p-3 rounded-xl text-sm">
-                <input type="date" id="new-end" class="w-full border p-3 rounded-xl text-sm">
+                <input type="date" id="new-start" class="border p-3 rounded-xl text-sm">
+                <input type="date" id="new-end" class="border p-3 rounded-xl text-sm">
             </div>
             <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg">Create Job</button>
             <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
@@ -131,26 +133,61 @@
                     <option value="Completed">PAID</option>
                 </select>
             </div>
-            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold">
-            <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm">
-            <input type="text" id="edit-postcode" class="w-full border p-3 rounded-xl text-sm uppercase">
+            
+            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold" placeholder="Client Name">
             <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="text-[9px] font-black uppercase text-gray-400">Total Amount £</label>
-                    <input type="number" id="edit-value" class="w-full border p-3 rounded-xl font-bold">
-                </div>
-                <div>
-                    <label class="text-[9px] font-black uppercase text-gray-400">Days</label>
-                    <div id="edit-duration-display" class="w-full bg-gray-50 p-3 rounded-xl font-black text-center text-sm">--</div>
+                <input type="tel" id="edit-phone" class="border p-4 rounded-xl text-sm" placeholder="Phone">
+                <input type="email" id="edit-email" class="border p-4 rounded-xl text-sm" placeholder="Email">
+            </div>
+
+            <div class="space-y-2 border-y py-3">
+                <p class="text-[10px] font-black text-gray-400 uppercase">Site Address</p>
+                <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 1">
+                <input type="text" id="edit-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 2">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="edit-city" class="border p-3 rounded-xl text-sm" placeholder="City">
+                    <input type="text" id="edit-postcode" class="border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-                <input type="date" id="edit-start" oninput="updateDurationUI()" class="w-full border p-3 rounded-xl text-sm">
-                <input type="date" id="edit-end" oninput="updateDurationUI()" class="w-full border p-3 rounded-xl text-sm">
+
+            <div class="grid grid-cols-3 gap-2">
+                <div class="bg-gray-50 p-3 rounded-xl">
+                    <label class="text-[9px] font-black uppercase text-gray-400">Quote £</label>
+                    <input type="number" id="edit-value" class="w-full bg-transparent font-bold">
+                </div>
+                <div class="bg-gray-50 p-3 rounded-xl text-center">
+                    <label class="text-[9px] font-black uppercase text-gray-400">Duration</label>
+                    <div id="edit-dur" class="font-black text-sm">--</div>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-xl text-center">
+                    <label class="text-[9px] font-black uppercase text-gray-400">Profit £</label>
+                    <div id="edit-profit" class="font-black text-sm text-green-600">0</div>
+                </div>
             </div>
-            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase">Save Changes</button>
-            <button onclick="closeModal('edit-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
-            <button onclick="deleteJob()" class="w-full text-red-500 font-black uppercase text-[10px]">Delete Job</button>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-gray-50 p-3 rounded-xl">
+                    <label class="text-[9px] font-black uppercase text-gray-400">Multi Bags</label>
+                    <input type="number" id="edit-multi" oninput="calcProfit()" class="w-full bg-transparent font-bold">
+                </div>
+                <div class="bg-gray-50 p-3 rounded-xl">
+                    <label class="text-[9px] font-black uppercase text-gray-400">Boards</label>
+                    <input type="number" id="edit-boards" oninput="calcProfit()" class="w-full bg-transparent font-bold">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <input type="date" id="edit-start" oninput="updateEditDur()" class="border p-3 rounded-xl text-sm">
+                <input type="date" id="edit-end" oninput="updateEditDur()" class="border p-3 rounded-xl text-sm">
+            </div>
+
+            <textarea id="edit-notes" class="w-full border p-4 rounded-xl h-20 text-sm" placeholder="Notes..."></textarea>
+            
+            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg">Save Changes</button>
+            <div class="flex justify-between items-center px-2">
+                <button onclick="closeModal('edit-modal')" class="text-gray-400 font-bold">Cancel</button>
+                <button onclick="deleteJob()" class="text-red-500 font-black text-[10px] uppercase">Delete Job</button>
+            </div>
         </div>
     </div>
 
@@ -158,23 +195,12 @@
         let appState = { 
             jobs: [], 
             filter: 'All', 
-            profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "", logo: "https://lh3.googleusercontent.com/d/1yvG5nEIdaDtjanVHDJR5hSa0sH3UzV41" }
+            rates: { bag: 11.50, board: 14.20 },
+            profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "", logo: "" }
         };
         
-        function calculateDuration(start, end) {
-            if(!start || !end) return "TBC";
-            const s = new Date(start), e = new Date(end);
-            const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
-            return diff > 0 ? `${diff} Day${diff > 1 ? 's' : ''}` : "Invalid";
-        }
-
-        function updateDurationUI() {
-            const s = document.getElementById('edit-start').value, e = document.getElementById('edit-end').value;
-            document.getElementById('edit-duration-display').innerText = calculateDuration(s, e);
-        }
-
         function init() {
-            const saved = localStorage.getItem('megson_pro_local_v3');
+            const saved = localStorage.getItem('megson_ultimate_local_v1');
             if(saved) appState = JSON.parse(saved);
             document.getElementById('biz-name').value = appState.profile.bizName || "";
             document.getElementById('user-real-name').value = appState.profile.realName || "";
@@ -182,19 +208,29 @@
             document.getElementById('user-email').value = appState.profile.email || "";
             document.getElementById('user-acc').value = appState.profile.acc || "";
             document.getElementById('user-sort').value = appState.profile.sort || "";
-            updateUIBranding(); renderJobs();
+            document.getElementById('rate-bag').value = appState.rates.bag;
+            document.getElementById('rate-board').value = appState.rates.board;
+            updateUIBranding();
+            renderJobs();
         }
 
-        function save() { localStorage.setItem('megson_pro_local_v3', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_ultimate_local_v1', JSON.stringify(appState)); }
+
+        function calculateDuration(start, end) {
+            if(!start || !end) return "TBC";
+            const s = new Date(start), e = new Date(end);
+            const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+            return diff > 0 ? `${diff} Day${diff > 1 ? 's' : ''}` : "TBC";
+        }
 
         function createNewJob() {
             const name = document.getElementById('new-client').value;
             if(!name) return alert("Enter client name");
             appState.jobs.push({ 
-                id: Date.now(), client: name, addr1: document.getElementById('new-addr1').value, 
-                postcode: document.getElementById('new-postcode').value,
-                dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value,
-                status: "Pending", value: 0 
+                id: Date.now(), client: name, 
+                addr1: document.getElementById('new-addr1').value, addr2: "", city: document.getElementById('new-city').value, postcode: document.getElementById('new-postcode').value,
+                phone: "", email: "", dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value,
+                status: "Pending", value: 0, multi: 0, boards: 0, notes: "" 
             });
             save(); renderJobs(); closeModal('add-modal');
         }
@@ -204,84 +240,120 @@
             const filtered = appState.jobs.filter(j => appState.filter === 'All' || j.status === appState.filter);
             const statusStyle = { "Pending": "border-gray-300", "Invoiced": "border-orange-500", "Completed": "border-green-500" };
 
-            container.innerHTML = filtered.map(job => `
+            container.innerHTML = filtered.map(job => {
+                const matCost = (job.multi * appState.rates.bag) + (job.boards * appState.rates.board);
+                const profit = job.value - matCost;
+                const fullAddr = [job.addr1, job.city, job.postcode].filter(Boolean).join(', ');
+                const dur = calculateDuration(job.dateFrom, job.dateTo);
+                
+                return `
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-l-[12px] ${statusStyle[job.status]}">
                     <div class="flex justify-between items-start mb-4" onclick="openEdit(${job.id})">
                         <div>
                             <h3 class="font-black text-gray-800 uppercase text-lg leading-tight">${job.client} ✏️</h3>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">${fullAddr || 'No Address'}</p>
                             <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${calculateDuration(job.dateFrom, job.dateTo)}</span>
-                                <span class="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded uppercase">£${job.value}</span>
+                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${dur}</span>
+                                <span class="text-[9px] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase">Profit: £${profit.toFixed(0)}</span>
                             </div>
                         </div>
                         <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="window.location.href='tel:${job.phone}'" class="bg-slate-100 p-3 rounded-xl text-[9px] font-black uppercase">📞 Call</button>
+                        <button onclick="copyToClipboard('${job.phone}')" class="bg-slate-100 p-3 rounded-xl text-[9px] font-black uppercase">📋 Copy</button>
+                        <button onclick="emailQuote(${job.id})" class="bg-orange-100 text-orange-600 p-3 rounded-xl text-[9px] font-black uppercase">📧 Email</button>
                         <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-3 rounded-xl text-[9px] font-black uppercase">📄 PDF</button>
-                        <button onclick="addToCalendar(${job.id})" class="bg-green-600 text-white p-3 rounded-xl text-[9px] font-black uppercase">📅 Calendar</button>
                     </div>
-                </div>`).join('');
+                    <button onclick="addToCalendar(${job.id})" class="w-full mt-2 bg-green-600 text-white p-2 rounded-xl text-[9px] font-black uppercase font-bold">📅 Add to Calendar</button>
+                </div>`;
+            }).join('');
         }
 
         function openEdit(id) {
             const job = appState.jobs.find(j => j.id === id);
             appState.currentEditId = id;
             document.getElementById('edit-client').value = job.client;
-            document.getElementById('edit-addr1').value = job.addr1;
-            document.getElementById('edit-postcode').value = job.postcode;
-            document.getElementById('edit-value').value = job.value;
-            document.getElementById('edit-start').value = job.dateFrom;
-            document.getElementById('edit-end').value = job.dateTo;
+            document.getElementById('edit-addr1').value = job.addr1 || '';
+            document.getElementById('edit-addr2').value = job.addr2 || '';
+            document.getElementById('edit-city').value = job.city || '';
+            document.getElementById('edit-postcode').value = job.postcode || '';
+            document.getElementById('edit-phone').value = job.phone || '';
+            document.getElementById('edit-email').value = job.email || '';
+            document.getElementById('edit-value').value = job.value || 0;
+            document.getElementById('edit-multi').value = job.multi || 0;
+            document.getElementById('edit-boards').value = job.boards || 0;
+            document.getElementById('edit-start').value = job.dateFrom || '';
+            document.getElementById('edit-end').value = job.dateTo || '';
+            document.getElementById('edit-notes').value = job.notes || '';
             document.getElementById('edit-status').value = job.status;
-            updateDurationUI(); document.getElementById('edit-modal').classList.remove('hidden');
+            updateEditDur();
+            calcProfit();
+            document.getElementById('edit-modal').classList.remove('hidden');
         }
 
         function saveEdit() {
             const job = appState.jobs.find(j => j.id === appState.currentEditId);
             job.client = document.getElementById('edit-client').value;
             job.addr1 = document.getElementById('edit-addr1').value;
+            job.addr2 = document.getElementById('edit-addr2').value;
+            job.city = document.getElementById('edit-city').value;
             job.postcode = document.getElementById('edit-postcode').value;
+            job.phone = document.getElementById('edit-phone').value;
+            job.email = document.getElementById('edit-email').value;
             job.value = parseFloat(document.getElementById('edit-value').value) || 0;
+            job.multi = parseInt(document.getElementById('edit-multi').value) || 0;
+            job.boards = parseInt(document.getElementById('edit-boards').value) || 0;
             job.dateFrom = document.getElementById('edit-start').value;
             job.dateTo = document.getElementById('edit-end').value;
+            job.notes = document.getElementById('edit-notes').value;
             job.status = document.getElementById('edit-status').value;
             closeModal('edit-modal'); save(); renderJobs();
+        }
+
+        function updateEditDur() {
+            const s = document.getElementById('edit-start').value;
+            const e = document.getElementById('edit-end').value;
+            document.getElementById('edit-dur').innerText = calculateDuration(s, e);
+        }
+
+        function calcProfit() {
+            const val = parseFloat(document.getElementById('edit-value').value) || 0;
+            const multi = parseInt(document.getElementById('edit-multi').value) || 0;
+            const boards = parseInt(document.getElementById('edit-boards').value) || 0;
+            const cost = (multi * appState.rates.bag) + (boards * appState.rates.board);
+            document.getElementById('edit-profit').innerText = (val - cost).toFixed(2);
         }
 
         async function downloadPDF(jobId) {
             const job = appState.jobs.find(j => j.id === jobId);
             const doc = new jspdf.jsPDF();
             const isInvoice = job.status !== "Pending";
-            
             doc.setFillColor(0, 51, 102).rect(0, 0, 210, 40, 'F');
-            
-            // Branding from your Google Drive logo
-            if(appState.profile.logo) {
-                try {
-                    doc.addImage(appState.profile.logo, 'PNG', 15, 5, 30, 30);
-                } catch(e) { console.log("Logo load issue, skipping image."); }
-            }
-
             doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 50, 22);
             doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 50, 30);
-            
             doc.setTextColor(0).setFontSize(18).text(isInvoice ? 'INVOICE' : 'QUOTATION', 20, 60);
             doc.setFontSize(10).text(`To: ${job.client}`, 20, 75);
-            doc.text(`Site: ${job.addr1}, ${job.postcode}`, 20, 80);
-            doc.text(`Project Dates: ${job.dateFrom} to ${job.dateTo}`, 20, 85);
-            
+            doc.text(`Site Address: ${job.addr1}, ${job.city}, ${job.postcode}`, 20, 80);
+            doc.text(`Estimated Dates: ${job.dateFrom} to ${job.dateTo}`, 20, 85);
             doc.setFontSize(12).setFont(undefined, 'bold').text(`Total Amount: £${job.value.toFixed(2)}`, 20, 105);
-            
-            if(isInvoice && (appState.profile.acc || appState.profile.sort)) {
+            if(isInvoice && appState.profile.acc) {
                 doc.setDrawColor(200).line(20, 120, 190, 120);
                 doc.setFontSize(10).text('PAYMENT DETAILS', 20, 130);
                 doc.setFontSize(9).setFont(undefined, 'normal');
-                doc.text(`Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 138);
+                doc.text(`Account Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 138);
                 doc.text(`Account Number: ${appState.profile.acc}`, 20, 144);
                 doc.text(`Sort Code: ${appState.profile.sort}`, 20, 150);
             }
             doc.save(`${isInvoice ? 'Invoice' : 'Quote'}_${job.client}.pdf`);
+        }
+
+        function emailQuote(id) {
+            const job = appState.jobs.find(j => j.id === id);
+            const type = job.status === "Pending" ? "Quote" : "Invoice";
+            const body = encodeURIComponent(`Hi ${job.client},\n\nAttached is your ${type} for ${job.addr1}.\nTotal: £${job.value}\n\nThanks,\n${appState.profile.bizName}`);
+            window.location.href = `mailto:${job.email}?subject=${type} for ${job.addr1}&body=${body}`;
         }
 
         function addToCalendar(id) {
@@ -294,6 +366,12 @@
             const a = document.createElement('a'); a.href = url; a.download = `job_${job.client}.ics`; a.click();
         }
 
+        function copyToClipboard(text) {
+            if(!text) return alert("No number set");
+            navigator.clipboard.writeText(text);
+            alert("Copied to clipboard!");
+        }
+
         function updateProfile() {
             appState.profile.bizName = document.getElementById('biz-name').value;
             appState.profile.realName = document.getElementById('user-real-name').value;
@@ -302,6 +380,12 @@
             appState.profile.acc = document.getElementById('user-acc').value;
             appState.profile.sort = document.getElementById('user-sort').value;
             updateUIBranding(); save();
+        }
+
+        function updateRates() {
+            appState.rates.bag = parseFloat(document.getElementById('rate-bag').value) || 0;
+            appState.rates.board = parseFloat(document.getElementById('rate-board').value) || 0;
+            save(); renderJobs();
         }
 
         function updateUIBranding() { if(appState.profile.phone) document.getElementById('header-phone').innerText = appState.profile.phone; }
