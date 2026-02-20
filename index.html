@@ -10,254 +10,312 @@
         :root { --megson-blue: #003366; --megson-orange: #f39c12; }
         .bg-megson-blue { background-color: var(--megson-blue); }
         .text-megson-blue { color: var(--megson-blue); }
-        input[type="range"]::-webkit-slider-thumb { background: var(--megson-orange); }
-        /* Smooth transition for status colors */
-        .status-chip { transition: all 0.2s ease; cursor: pointer; }
+        .filter-pill.active { background-color: var(--megson-blue); color: white; border-color: var(--megson-blue); }
+        #phone-modal { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .tab-btn.active { color: var(--megson-orange); border-top: 3px solid var(--megson-orange); }
     </style>
 </head>
-<body class="bg-gray-100 font-sans pb-24">
+<body class="bg-gray-100 font-sans pb-28">
+
+    <div id="phone-modal" class="hidden fixed inset-0 z-[100] flex items-end justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-8 text-center border-b"><p id="modal-phone-display" class="text-2xl font-black text-gray-800 tracking-tight"></p></div>
+            <div class="flex flex-col">
+                <button id="call-btn" class="p-6 text-lg font-bold text-blue-600 border-b active:bg-gray-100">📞 Call Now</button>
+                <button id="copy-btn" class="p-6 text-lg font-bold text-gray-700 border-b active:bg-gray-100">📋 Copy Number</button>
+                <button onclick="closePhoneModal()" class="p-6 text-lg font-medium text-red-500 active:bg-gray-100">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <div id="auth-screen" class="fixed inset-0 bg-megson-blue z-50 flex flex-col items-center justify-center p-6 text-white text-center">
-        <h1 class="text-3xl font-bold mb-8 tracking-tighter uppercase">Megson Plastering</h1>
+        <h1 class="text-3xl font-bold mb-8 tracking-tighter uppercase italic">Megson Plastering</h1>
         <div id="setup-pass" class="hidden w-full max-w-xs">
-            <p class="mb-4 text-sm">Create your app password:</p>
-            <input type="password" id="new-pw" class="w-full p-4 rounded text-black mb-4" placeholder="e.g. 1234">
-            <button onclick="setInitialPassword()" class="w-full bg-orange-500 p-4 rounded-xl font-bold shadow-lg">Set Password</button>
+            <input type="password" id="new-pw" class="w-full p-4 rounded-2xl text-black mb-4" placeholder="Create App Password">
+            <button onclick="setInitialPassword()" class="w-full bg-orange-500 p-4 rounded-2xl font-bold shadow-lg">Set Password</button>
         </div>
         <div id="login-pass" class="hidden w-full max-w-xs">
-            <input type="password" id="login-pw" class="w-full p-4 rounded text-black mb-4" placeholder="Enter Password">
-            <button onclick="checkPassword()" class="w-full bg-orange-500 p-4 rounded-xl font-bold shadow-lg">Unlock App</button>
+            <input type="password" id="login-pw" class="w-full p-4 rounded-2xl text-black mb-4" placeholder="Enter Password">
+            <button onclick="checkPassword()" class="w-full bg-orange-500 p-4 rounded-2xl font-bold shadow-lg">Unlock App</button>
         </div>
     </div>
 
     <div id="app-content" class="hidden">
-        <header class="bg-megson-blue text-white p-5 shadow-lg sticky top-0 z-40 flex justify-between items-center">
-            <span class="font-bold tracking-tight uppercase">Megson Plastering</span>
-            <button onclick="showSection('settings')" class="text-xs bg-white/10 px-3 py-2 rounded-lg">Settings</button>
+        <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-20">
+            <div id="header-logo-container" class="h-full flex items-center">
+                <span class="font-black text-xl tracking-tighter uppercase italic">Megson Plastering</span>
+            </div>
+            <button onclick="showSection('settings')" class="text-2xl">⚙️</button>
         </header>
 
         <section id="sec-jobs" class="p-4 space-y-4">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-megson-blue">Project Pipeline</h2>
+            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                <button onclick="setFilter('All')" class="filter-pill active px-4 py-2 rounded-full border bg-white text-xs font-bold transition-all" data-status="All">All</button>
+                <button onclick="setFilter('Pending')" class="filter-pill px-4 py-2 rounded-full border bg-white text-xs font-bold transition-all text-gray-500" data-status="Pending">Pending</button>
+                <button onclick="setFilter('Active')" class="filter-pill px-4 py-2 rounded-full border bg-white text-xs font-bold transition-all text-blue-500" data-status="Active">Active</button>
+                <button onclick="setFilter('Completed')" class="filter-pill px-4 py-2 rounded-full border bg-white text-xs font-bold transition-all text-green-500" data-status="Completed">Completed</button>
             </div>
+
             <div class="relative">
-                <input type="text" id="job-search" placeholder="Search client or address..." 
-                       class="w-full p-3 pl-10 rounded-xl border-none shadow-sm text-sm" 
-                       oninput="renderJobs()">
-                <span class="absolute left-3 top-3 text-gray-400">🔍</span>
+                <input type="text" id="job-search" placeholder="Search name or town..." class="w-full p-4 pl-12 rounded-2xl border-none shadow-sm text-sm" oninput="renderJobs()">
+                <span class="absolute left-4 top-4 text-xl">🔍</span>
             </div>
-            <div id="job-list-container" class="space-y-3"></div>
+            <div id="job-list-container" class="space-y-4"></div>
         </section>
 
-        <section id="sec-add-job" class="p-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-megson-blue">
-                <h2 class="text-xl font-bold mb-4 text-megson-blue">New Project</h2>
-                <input type="text" id="client-name" placeholder="Client Name" class="w-full border p-4 rounded-xl mb-3">
-                <input type="text" id="client-address" placeholder="Job Site Address" class="w-full border p-4 rounded-xl mb-3">
-                <textarea id="job-notes" placeholder="Project Notes (e.g. Scaffolding, match artex...)" class="w-full border p-4 rounded-xl mb-3 h-24 text-sm"></textarea>
-                <select id="job-status" class="w-full border p-4 rounded-xl mb-6">
-                    <option value="Pending">Status: Pending</option>
-                    <option value="Active">Status: Active</option>
-                    <option value="Completed">Status: Completed</option>
-                </select>
-                <button onclick="saveJob()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-bold">Create Job Card</button>
+        <section id="sec-add-job" class="p-4 hidden pb-24">
+            <div class="bg-white p-6 rounded-3xl shadow-md border-t-8 border-megson-blue">
+                <h2 class="text-xl font-black mb-6 text-megson-blue uppercase italic">New Job Card</h2>
+                
+                <div class="space-y-3">
+                    <input type="text" id="client-name" placeholder="Client Name" class="w-full border p-4 rounded-2xl">
+                    <input type="tel" id="client-phone" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
+                    
+                    <hr class="my-4">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Site Address</label>
+                    <input type="text" id="addr-1" placeholder="Address Line 1" class="w-full border p-4 rounded-2xl">
+                    <input type="text" id="addr-2" placeholder="Address Line 2" class="w-full border p-4 rounded-2xl">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="addr-town" placeholder="Town/City" class="border p-4 rounded-2xl">
+                        <input type="text" id="addr-county" placeholder="County" class="border p-4 rounded-2xl">
+                    </div>
+                    <input type="text" id="addr-postcode" placeholder="Postcode" class="w-full border p-4 rounded-2xl">
+
+                    <hr class="my-4">
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-2">Project Schedule</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-50 p-3 rounded-2xl">
+                            <span class="text-[9px] font-bold block mb-1">Start Date</span>
+                            <input type="date" id="date-from" class="w-full bg-transparent text-sm" onchange="calcDateTo()">
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-2xl">
+                            <span class="text-[9px] font-bold block mb-1">Total Days</span>
+                            <input type="number" id="job-duration" placeholder="0" class="w-full bg-transparent text-sm" oninput="calcDateTo()">
+                        </div>
+                    </div>
+                    <input type="date" id="date-to" class="hidden"> <textarea id="job-notes" placeholder="Notes (Scope of work, parking etc...)" class="w-full border p-4 rounded-2xl h-28 text-sm"></textarea>
+                    <button onclick="saveJob()" class="w-full bg-megson-blue text-white p-5 rounded-2xl font-black shadow-lg uppercase tracking-widest mt-4">Create Job Card</button>
+                </div>
             </div>
         </section>
 
         <section id="sec-pro-calc" class="p-4 hidden pb-10">
-            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-megson-blue">
-                <h2 class="text-xl font-bold text-megson-blue mb-2">Pro Materials Calc</h2>
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <div><label class="text-[10px] font-bold text-gray-400">L (m)</label><input type="number" id="pro-L" class="w-full border p-2 rounded" oninput="runProCalc()"></div>
-                    <div><label class="text-[10px] font-bold text-gray-400">W (m)</label><input type="number" id="pro-W" class="w-full border p-2 rounded" oninput="runProCalc()"></div>
-                    <div><label class="text-[10px] font-bold text-gray-400">H (m)</label><input type="number" id="pro-H" class="w-full border p-2 rounded" oninput="runProCalc()"></div>
+            <div class="bg-white p-6 rounded-3xl shadow-md border-t-8 border-megson-blue">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-black text-megson-blue uppercase italic">Material Calc</h2>
+                    <span class="bg-orange-100 text-orange-600 text-[10px] font-black px-3 py-1 rounded-full">+50% BUFFER</span>
                 </div>
-                <div class="space-y-4 mb-6">
-                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl text-sm"><span class="font-medium">Ceiling?</span><input type="checkbox" id="pro-ceiling" onchange="runProCalc()" class="w-5 h-5"></div>
-                    <input type="number" id="pro-corners" placeholder="External Corners (Qty)" class="w-full border p-3 rounded-xl" oninput="runProCalc()">
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="text-center"><label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">Length (m)</label><input type="number" id="pro-L" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
+                    <div class="text-center"><label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">Width (m)</label><input type="number" id="pro-W" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
+                    <div class="text-center"><label class="text-[10px] font-bold text-gray-400 block mb-2 uppercase">Height (m)</label><input type="number" id="pro-H" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
                 </div>
-                <div class="space-y-2 border-t pt-4">
-                    <div class="flex justify-between bg-blue-50 p-3 rounded-lg"><span class="text-sm font-bold">Boards</span><span id="res-boards" class="font-bold text-megson-blue">0</span></div>
-                    <div class="flex justify-between text-xs p-1"><span>Bags</span><span id="res-multi" class="font-bold">0</span></div>
-                    <div class="flex justify-between text-xs p-1"><span>Beads</span><span id="res-beads" class="font-bold">0</span></div>
-                    <div class="flex justify-between text-xs p-1"><span>Tape</span><span id="res-scrim" class="font-bold">0</span></div>
-                    <div class="flex justify-between text-xs p-1"><span>Screws</span><span id="res-screws" class="font-bold">0</span></div>
+                <div class="flex items-center justify-between bg-gray-50 p-5 rounded-2xl text-sm mb-6 font-black uppercase"><span>Include Ceiling?</span><input type="checkbox" id="pro-ceiling" onchange="runProCalc()" class="w-8 h-8"></div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-6 rounded-3xl text-center">
+                        <span class="text-xs uppercase font-black text-blue-400">Boards</span>
+                        <div id="res-boards" class="text-4xl font-black text-megson-blue mt-1">0</div>
+                    </div>
+                    <div class="bg-orange-50 p-6 rounded-3xl text-center">
+                        <span class="text-xs uppercase font-black text-orange-400">Multi Bags</span>
+                        <div id="res-multi" class="text-4xl font-black text-orange-600 mt-1">0</div>
+                    </div>
                 </div>
-            </div>
-        </section>
-
-        <section id="sec-estimator" class="p-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-megson-blue">
-                <h2 class="text-xl font-bold text-megson-blue mb-4">Pricing Estimator</h2>
-                <div class="grid grid-cols-3 gap-2 mb-4">
-                    <input type="number" id="est-L" placeholder="L" class="border p-2 rounded" oninput="calculateEstimate()">
-                    <input type="number" id="est-W" placeholder="W" class="border p-2 rounded" oninput="calculateEstimate()">
-                    <input type="number" id="est-H" placeholder="H" class="border p-2 rounded" oninput="calculateEstimate()">
-                </div>
-                <select id="est-material" class="w-full border p-4 rounded-xl mb-4" onchange="calculateEstimate()">
-                    <option value="MultiFinish">MultiFinish</option>
-                    <option value="Bonding">Bonding</option>
-                </select>
-                <div class="bg-blue-50 p-4 rounded-xl">
-                    <div class="flex justify-between font-bold"><span>Bags:</span><span id="res-bags">0</span></div>
-                    <div class="flex justify-between text-sm"><span>Cost:</span><span id="res-cost">£0.00</span></div>
-                    <button onclick="saveEstimateToQuote()" class="w-full mt-4 bg-orange-500 text-white p-4 rounded-xl font-bold">Apply to Quote →</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="sec-quote" class="p-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-orange-500">
-                <h2 class="text-xl font-bold text-megson-blue mb-4">Quote Builder</h2>
-                <input type="number" id="quote-labour" placeholder="Labour (£)" class="w-full border p-4 rounded-xl mb-3" oninput="calculateFinalQuote()">
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-4">
-                    <span class="font-bold">Add 20% VAT</span>
-                    <input type="checkbox" id="quote-vat" class="w-6 h-6" onchange="calculateFinalQuote()">
-                </div>
-                <div class="bg-megson-blue text-white p-6 rounded-2xl">
-                    <div class="flex justify-between text-2xl font-bold"><span>Total</span><span id="final-total">£0.00</span></div>
-                </div>
-                <button onclick="finalizeAndSaveQuote()" class="w-full mt-6 bg-green-600 text-white p-4 rounded-2xl font-bold">💾 Save Final Quote</button>
             </div>
         </section>
 
         <section id="sec-settings" class="p-4 hidden">
-            <div class="bg-white p-6 rounded-2xl shadow-md">
-                <h2 class="text-xl font-bold text-megson-blue mb-4">Settings</h2>
-                <input type="file" id="logo-input" accept="image/*" onchange="handleLogoUpload(this)" class="mb-4 text-xs">
-                <div id="logo-preview" class="h-20 border-2 border-dashed flex items-center justify-center mb-6 rounded-xl text-[10px]">Logo Preview</div>
-                <button onclick="localStorage.clear(); location.reload();" class="w-full text-red-500 font-bold uppercase text-[10px]">Reset App Data</button>
+            <div class="bg-white p-8 rounded-3xl shadow-md">
+                <h2 class="text-xl font-black text-megson-blue mb-6 uppercase italic">Settings</h2>
+                <label class="text-xs font-black uppercase text-gray-400 block mb-3">Company Logo</label>
+                <input type="file" id="logo-input" accept="image/*" onchange="handleLogoUpload(this)" class="mb-6 text-xs w-full">
+                <div id="logo-preview" class="h-32 border-4 border-dashed border-gray-100 flex items-center justify-center mb-8 rounded-3xl text-xs text-gray-300 italic uppercase">Preview</div>
+                <button onclick="localStorage.clear(); location.reload();" class="w-full text-red-400 font-bold uppercase text-xs mt-10">⚠️ Reset All App Data</button>
             </div>
         </section>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 shadow-lg">
-            <button onclick="showSection('jobs')" class="flex flex-col items-center text-[10px] text-megson-blue font-bold">📁 Jobs</button>
-            <button onclick="showSection('pro-calc')" class="flex flex-col items-center text-[10px] text-gray-400">🧮 Calc</button>
-            <button onclick="showSection('add-job')" class="flex flex-col items-center text-[10px] text-gray-400">➕ Add</button>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 shadow-2xl h-24">
+            <button onclick="showSection('jobs')" class="tab-btn active flex flex-col items-center text-xs font-black"><span class="text-3xl mb-1">📁</span>Jobs</button>
+            <button onclick="showSection('pro-calc')" class="tab-btn flex flex-col items-center text-xs font-black text-gray-400"><span class="text-3xl mb-1">🧮</span>Calc</button>
+            <button onclick="showSection('add-job')" class="tab-btn flex flex-col items-center text-xs font-black text-gray-400"><span class="text-3xl mb-1">➕</span>Add</button>
         </nav>
     </div>
 
     <script>
-        let appState = { password: null, jobs: [], logo: null, pricing: { "MultiFinish": { coverage: 10, price: 8.50 }, "Bonding": { coverage: 3, price: 12.00 } } };
-        let currentMaterialCost = 0, activeJobId = null;
-
+        let appState = { password: null, jobs: [], logo: null, filter: 'All' };
+        
         function init() {
             const saved = localStorage.getItem('megson_data');
-            if(saved) { appState = JSON.parse(saved); document.getElementById('login-pass').classList.remove('hidden'); updateLogoPreview(); } 
-            else { document.getElementById('setup-pass').classList.remove('hidden'); }
+            if(saved) { 
+                appState = JSON.parse(saved); 
+                document.getElementById('login-pass').classList.remove('hidden'); 
+                updateBranding();
+            } else { document.getElementById('setup-pass').classList.remove('hidden'); }
         }
 
         function setInitialPassword() { appState.password = btoa(document.getElementById('new-pw').value); saveToStorage(); location.reload(); }
-        function checkPassword() { if(btoa(document.getElementById('login-pw').value) === appState.password) { document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-content').classList.remove('hidden'); renderJobs(); } else alert("Wrong!"); }
+        function checkPassword() { if(btoa(document.getElementById('login-pw').value) === appState.password) { document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-content').classList.remove('hidden'); renderJobs(); } else alert("Access Denied"); }
 
         function showSection(id) {
-            ['jobs', 'add-job', 'estimator', 'quote', 'settings', 'pro-calc'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+            ['jobs', 'add-job', 'settings', 'pro-calc'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
             document.getElementById('sec-' + id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-megson-blue'));
+        }
+
+        function setFilter(status) {
+            appState.filter = status;
+            document.querySelectorAll('.filter-pill').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.status === status) btn.classList.add('active');
+            });
+            renderJobs();
+        }
+
+        function openPhoneModal(phone) {
+            document.getElementById('modal-phone-display').innerText = phone;
+            document.getElementById('call-btn').onclick = () => { window.location.href = `tel:${phone}`; closePhoneModal(); };
+            document.getElementById('copy-btn').onclick = () => { navigator.clipboard.writeText(phone); alert('Copied!'); closePhoneModal(); };
+            document.getElementById('phone-modal').classList.remove('hidden');
+        }
+        function closePhoneModal() { document.getElementById('phone-modal').classList.add('hidden'); }
+
+        function calcDateTo() {
+            const start = document.getElementById('date-from').value;
+            const days = parseInt(document.getElementById('job-duration').value);
+            if(start && days) { 
+                let d = new Date(start); 
+                d.setDate(d.getDate() + (days - 1));
+                document.getElementById('date-to').value = d.toISOString().split('T')[0];
+            }
         }
 
         function saveJob() {
-            appState.jobs.push({ 
-                id: Date.now(), client: document.getElementById('client-name').value, 
-                address: document.getElementById('client-address').value, 
-                notes: document.getElementById('job-notes').value,
-                status: document.getElementById('job-status').value, quote: null 
-            });
-            saveToStorage(); showSection('jobs'); renderJobs();
-            document.getElementById('client-name').value = ""; document.getElementById('client-address').value = ""; document.getElementById('job-notes').value = "";
+            const job = {
+                id: Date.now(), client: document.getElementById('client-name').value, phone: document.getElementById('client-phone').value,
+                address: { 
+                    l1: document.getElementById('addr-1').value, 
+                    l2: document.getElementById('addr-2').value,
+                    town: document.getElementById('addr-town').value, 
+                    county: document.getElementById('addr-county').value,
+                    postcode: document.getElementById('addr-postcode').value 
+                },
+                dateFrom: document.getElementById('date-from').value, 
+                dateTo: document.getElementById('date-to').value,
+                notes: document.getElementById('job-notes').value, 
+                status: "Pending", actualBags: ""
+            };
+            appState.jobs.push(job); saveToStorage(); showSection('jobs'); renderJobs();
+            // Reset fields
+            ['client-name', 'client-phone', 'addr-1', 'addr-2', 'addr-town', 'addr-county', 'addr-postcode', 'date-from', 'job-duration', 'job-notes'].forEach(i => document.getElementById(i).value = "");
         }
 
-        function toggleStatus(jobId) {
-            const job = appState.jobs.find(j => j.id === jobId);
-            const cycle = { "Pending": "Active", "Active": "Completed", "Completed": "Pending" };
-            job.status = cycle[job.status];
+        function updateActualBags(id, val) {
+            const job = appState.jobs.find(j => j.id === id);
+            job.actualBags = val;
             saveToStorage();
-            renderJobs();
         }
 
         function renderJobs() {
             const query = document.getElementById('job-search').value.toLowerCase();
             const container = document.getElementById('job-list-container');
-            const filtered = appState.jobs.filter(j => j.client.toLowerCase().includes(query) || j.address.toLowerCase().includes(query));
+            
+            const filtered = appState.jobs.filter(j => {
+                const matchesSearch = j.client.toLowerCase().includes(query) || j.address.town.toLowerCase().includes(query);
+                const matchesStatus = (appState.filter === 'All' || j.status === appState.filter);
+                return matchesSearch && matchesStatus;
+            });
 
-            const statusColors = { "Active": "border-blue-500 bg-blue-50 text-blue-700", "Pending": "border-gray-300 bg-gray-50 text-gray-600", "Completed": "border-green-500 bg-green-50 text-green-700" };
+            const statusColors = { "Active": "border-blue-500", "Pending": "border-gray-300", "Completed": "border-green-500" };
 
             container.innerHTML = filtered.length ? filtered.map(job => `
-                <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 ${job.status === 'Active' ? 'border-blue-500' : job.status === 'Completed' ? 'border-green-500' : 'border-gray-300'}">
-                    <div class="flex justify-between items-start">
-                        <div><h3 class="font-bold text-gray-800">${job.client}</h3><p class="text-[10px] text-gray-500">${job.address}</p></div>
-                        <button onclick="toggleStatus(${job.id})" class="status-chip text-[8px] px-2 py-1 rounded-full font-bold uppercase shadow-sm ${statusColors[job.status]}">
-                            ${job.status} 🔄
-                        </button>
+                <div class="bg-white p-6 rounded-3xl shadow-md border-l-[12px] ${statusColors[job.status]}">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-black text-gray-800 uppercase text-base">${job.client}</h3>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${job.address.l1}, ${job.address.town}</p>
+                        </div>
+                        <button onclick="toggleStatus(${job.id})" class="text-[10px] px-3 py-1 rounded-full font-black uppercase border-2 ${job.status === 'Completed' ? 'border-green-500 text-green-500' : 'border-gray-200 text-gray-400'}">${job.status}</button>
                     </div>
-                    ${job.notes ? `<div class="mt-2 bg-gray-50 p-2 rounded text-[10px] italic text-gray-600 border-l-2 border-orange-400">${job.notes}</div>` : ''}
-                    <div class="mt-4 flex justify-between items-center border-t pt-4">
-                        <span class="text-xs font-bold text-megson-blue">${job.quote ? '£'+job.quote.total : 'Unquoted'}</span>
-                        <div class="flex gap-2">
-                            ${job.quote ? `<button onclick="downloadPDF(${job.id})" class="bg-orange-500 text-white text-[10px] px-3 py-2 rounded-lg font-bold">📄 PDF</button>` : ''}
-                            <button onclick="startQuoting(${job.id})" class="bg-megson-blue text-white text-[10px] px-3 py-2 rounded-lg font-bold">Edit</button>
+                    
+                    <div class="flex items-center gap-3 mb-5">
+                        ${job.phone ? `<button onclick="openPhoneModal('${job.phone}')" class="text-xs font-black bg-gray-100 px-4 py-3 rounded-2xl flex-1 text-center">📞 CONTACT</button>` : ''}
+                        <div class="bg-orange-50 px-4 py-3 rounded-2xl flex-1 text-center">
+                            <span class="text-[9px] font-black text-orange-400 block uppercase">Start Date</span>
+                            <span class="text-xs font-black text-orange-600">${job.dateFrom || 'TBC'}</span>
                         </div>
                     </div>
-                </div>`).join('') : '<p class="text-center py-10 text-gray-400">No matching jobs found.</p>';
+
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(job.address.l1 + ' ' + job.address.postcode)}" target="_blank" class="bg-megson-blue text-white p-4 rounded-2xl text-xs font-black text-center">📍 OPEN MAPS</a>
+                        <button onclick="exportToCalendar(${job.id})" class="bg-gray-100 p-4 rounded-2xl text-xs font-black text-center text-gray-600">🗓️ CALENDAR</button>
+                    </div>
+
+                    <div class="bg-gray-50 p-5 rounded-2xl mb-4 border-2 border-dashed border-gray-100">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black uppercase text-gray-400">Actual Multi-Finish Used:</span>
+                            <input type="number" value="${job.actualBags}" onchange="updateActualBags(${job.id}, this.value)" placeholder="0" class="w-20 p-2 border-2 rounded-xl text-center font-black bg-white">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t-2 border-gray-50">
+                        <button onclick="deleteJob(${job.id})" class="text-red-300 text-xs font-black uppercase">Delete</button>
+                        <button onclick="downloadPDF(${job.id})" class="text-megson-blue text-xs font-black uppercase">Quote PDF →</button>
+                    </div>
+                </div>`).join('') : '<p class="text-center py-20 text-gray-300 font-bold uppercase text-xs tracking-widest">No Projects Found</p>';
+        }
+
+        function toggleStatus(jobId) {
+            const job = appState.jobs.find(j => j.id === jobId);
+            const cycle = { "Pending": "Active", "Active": "Completed", "Completed": "Pending" };
+            job.status = cycle[job.status]; saveToStorage(); renderJobs();
         }
 
         function runProCalc() {
             const L = parseFloat(document.getElementById('pro-L').value) || 0, W = parseFloat(document.getElementById('pro-W').value) || 0, H = parseFloat(document.getElementById('pro-H').value) || 0;
             const area = (2 * (L + W) * H) + (document.getElementById('pro-ceiling').checked ? (L * W) : 0);
-            const boards = Math.ceil(area / 2.88);
-            document.getElementById('res-boards').innerText = boards;
-            document.getElementById('res-multi').innerText = Math.ceil(area / 10);
-            document.getElementById('res-beads').innerText = document.getElementById('pro-corners').value || 0;
-            document.getElementById('res-scrim').innerText = Math.ceil((boards * 12) / 90);
-            document.getElementById('res-screws').innerText = boards * 50;
+            // 50% Buffer = 1.5 multiplier
+            document.getElementById('res-boards').innerText = Math.ceil((area / 2.88) * 1.5);
+            document.getElementById('res-multi').innerText = Math.ceil((area / 10) * 1.5);
         }
 
-        function startQuoting(jobId) { activeJobId = jobId; showSection('estimator'); }
-        function calculateEstimate() {
-            const L = parseFloat(document.getElementById('est-L').value)||0, W = parseFloat(document.getElementById('est-W').value)||0, H = parseFloat(document.getElementById('est-H').value)||0;
-            const area = (2 * (L + W) * H) + (document.getElementById('est-ceiling').checked ? (L * W) : 0);
-            const bags = Math.ceil(area / appState.pricing[document.getElementById('est-material').value].coverage);
-            currentMaterialCost = bags * appState.pricing[document.getElementById('est-material').value].price;
-            document.getElementById('res-bags').innerText = bags;
-            document.getElementById('res-cost').innerText = `£${currentMaterialCost.toFixed(2)}`;
-        }
-
-        function saveEstimateToQuote() { showSection('quote'); calculateFinalQuote(); }
-        function calculateFinalQuote() {
-            const sub = currentMaterialCost + (parseFloat(document.getElementById('quote-labour').value)||0);
-            const total = sub + (document.getElementById('quote-vat').checked ? sub * 0.2 : 0);
-            document.getElementById('final-total').innerText = `£${total.toFixed(2)}`;
-        }
-
-        function finalizeAndSaveQuote() {
-            const jobIndex = appState.jobs.findIndex(j => j.id === activeJobId);
-            appState.jobs[jobIndex].quote = { total: document.getElementById('final-total').innerText.replace('£',''), date: new Date().toLocaleDateString('en-GB') };
-            saveToStorage(); showSection('jobs'); renderJobs();
-        }
+        function deleteJob(id) { if(confirm("Permanently delete this project?")) { appState.jobs = appState.jobs.filter(j => j.id !== id); saveToStorage(); renderJobs(); } }
 
         function handleLogoUpload(input) {
             const reader = new FileReader();
-            reader.onload = (e) => { appState.logo = e.target.result; saveToStorage(); updateLogoPreview(); };
+            reader.onload = (e) => { appState.logo = e.target.result; saveToStorage(); updateBranding(); };
             reader.readAsDataURL(input.files[0]);
         }
-        function updateLogoPreview() { if(appState.logo) document.getElementById('logo-preview').innerHTML = `<img src="${appState.logo}" class="h-full object-contain">`; }
+        function updateBranding() {
+            if(appState.logo) {
+                document.getElementById('header-logo-container').innerHTML = `<img src="${appState.logo}" class="h-12 object-contain">`;
+                document.getElementById('logo-preview').innerHTML = `<img src="${appState.logo}" class="h-full object-contain">`;
+            }
+        }
+
+        function exportToCalendar(jobId) {
+            const job = appState.jobs.find(j => j.id === jobId);
+            const start = (job.dateFrom || "").replace(/-/g, '');
+            if(!start) return alert("Please set a date first.");
+            const icsData = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Megson Plastering: ${job.client}\nDESCRIPTION:${job.notes}\nDTSTART:${start}T080000Z\nLOCATION:${job.address.l1}, ${job.address.postcode}\nEND:VEVENT\nEND:VCALENDAR`;
+            const blob = new Blob([icsData], { type: 'text/calendar' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `${job.client}.ics`; link.click();
+        }
 
         async function downloadPDF(jobId) {
             const job = appState.jobs.find(j => j.id === jobId);
             const doc = new jspdf.jsPDF();
             if(appState.logo) doc.addImage(appState.logo, 'JPEG', 150, 10, 40, 40);
             doc.setFontSize(22).setTextColor(0, 51, 102).text("QUOTE", 20, 30);
-            doc.setFontSize(10).setTextColor(100).text("Megson Plastering", 20, 40).text(`Date: ${job.quote.date}`, 20, 45);
+            doc.setFontSize(10).setTextColor(100).text("Megson Plastering", 20, 40);
             doc.setDrawColor(243, 156, 18).line(20, 55, 190, 55);
-            doc.setFontSize(12).setTextColor(0).text("TO:", 20, 65).setFontSize(14).text(job.client, 20, 72).setFontSize(10).text(job.address, 20, 78);
-            if(job.notes) {
-                doc.setFontSize(9).setTextColor(100).text("Project Notes:", 20, 95);
-                doc.setFontSize(10).setTextColor(0).text(doc.splitTextToSize(job.notes, 160), 20, 100);
-            }
-            doc.setFillColor(245).rect(20, 120, 170, 10, 'F');
-            doc.text("Plastering Services", 25, 126).text(`£${job.quote.total}`, 170, 126);
-            doc.setFontSize(16).setTextColor(0, 51, 102).text(`Total: £${job.quote.total}`, 140, 150);
-            doc.save(`Megson_Quote_${job.client}.pdf`);
+            doc.setFontSize(12).text("CLIENT:", 20, 65).setFontSize(14).text(job.client, 20, 72);
+            doc.setFontSize(10).text([job.address.l1, job.address.l2, job.address.town, job.address.county, job.address.postcode].filter(Boolean), 20, 80);
+            doc.save(`Quote_${job.client}.pdf`);
         }
+
         function saveToStorage() { localStorage.setItem('megson_data', JSON.stringify(appState)); }
         init();
     </script>
