@@ -11,10 +11,11 @@
         .bg-megson-blue { background-color: var(--megson-blue); }
         .text-megson-blue { color: var(--megson-blue); }
         .filter-pill.active { background-color: var(--megson-blue); color: white; border-color: var(--megson-blue); }
-        #phone-modal, #edit-modal { background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        #phone-modal, #edit-modal, #add-modal { background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
         .tab-btn.active { color: var(--megson-orange); border-top: 4px solid var(--megson-orange); }
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
         .logo-img { height: 50px; width: auto; object-fit: contain; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-28">
@@ -32,6 +33,10 @@
         </header>
 
         <section id="sec-jobs" class="p-4 space-y-4">
+            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg flex justify-center items-center gap-2 mb-2">
+                <span class="text-xl">➕</span> Add New Job
+            </button>
+
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 <button onclick="setFilter('All')" class="filter-pill active px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="All">ALL</button>
                 <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-gray-400" data-status="Pending">PENDING</button>
@@ -99,6 +104,16 @@
             <button onclick="showSection('pro-calc')" class="tab-btn flex flex-col items-center text-[10px] font-black text-gray-400"><span class="text-3xl">🧮</span>Calc</button>
             <button onclick="showSection('settings')" class="tab-btn flex flex-col items-center text-[10px] font-black text-gray-400"><span class="text-3xl">⚙️</span>Setup</button>
         </nav>
+    </div>
+
+    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4">
+            <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
+            <input type="text" id="new-client" class="w-full border p-4 rounded-2xl" placeholder="Client Name">
+            <input type="tel" id="new-phone" class="w-full border p-4 rounded-2xl" placeholder="Phone Number">
+            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Create Job</button>
+            <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
+        </div>
     </div>
 
     <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -181,6 +196,33 @@
             document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`[data-status="${status}"]`).classList.add('active');
             renderJobs();
+        }
+
+        // ADD NEW JOB FUNCTIONS
+        function openAddModal() {
+            document.getElementById('new-client').value = '';
+            document.getElementById('new-phone').value = '';
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+
+        function createNewJob() {
+            const name = document.getElementById('new-client').value;
+            const phone = document.getElementById('new-phone').value;
+            if(!name) return alert("Please enter at least a client name.");
+            
+            const newJob = {
+                id: Date.now(),
+                client: name,
+                phone: phone,
+                status: "Pending",
+                dateFrom: "",
+                notes: ""
+            };
+            
+            appState.jobs.push(newJob);
+            save();
+            renderJobs();
+            closeModal('add-modal');
         }
 
         function renderJobs() {
