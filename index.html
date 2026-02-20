@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering</title>
+    <title>Megson Plastering Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -14,7 +14,7 @@
         #edit-modal, #add-modal { background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
         .tab-btn.active { color: var(--megson-orange); border-top: 4px solid var(--megson-orange); }
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
-        .logo-img { height: 50px; width: auto; object-fit: contain; }
+        .logo-img { height: 60px; width: auto; object-fit: contain; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -23,10 +23,12 @@
     <div id="app-content">
         <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-24">
             <div class="flex items-center gap-3">
-                <div id="header-logo-container"></div>
+                <div id="header-logo-container">
+                    <img src="https://lh3.googleusercontent.com/d/1yvG5nEIdaDtjanVHDJR5hSa0sH3UzV41" class="logo-img" alt="Megson Logo">
+                </div>
                 <div class="flex flex-col">
                     <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
-                    <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">PRO</span>
+                    <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">07955 315849</span>
                 </div>
             </div>
             <button onclick="showSection('settings')" class="text-3xl bg-white/10 p-2 rounded-xl">⚙️</button>
@@ -39,7 +41,7 @@
 
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 <button onclick="setFilter('All')" class="filter-pill active px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="All">ALL</button>
-                <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-gray-400" data-status="Pending">QUOTES</button>
+                <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="Pending">QUOTES</button>
                 <button onclick="setFilter('Invoiced')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-orange-500" data-status="Invoiced">INVOICED</button>
                 <button onclick="setFilter('Completed')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-green-500" data-status="Completed">PAID</button>
             </div>
@@ -93,11 +95,6 @@
                     <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
                 </div>
                 
-                <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-gray-200 text-center">
-                    <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
-                    <button onclick="document.getElementById('logo-upload').click()" class="bg-white border px-4 py-2 rounded-lg text-xs font-bold shadow-sm">Change Logo</button>
-                    <div id="logo-preview" class="mt-2 flex justify-center"></div>
-                </div>
                 <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
         </section>
@@ -161,7 +158,7 @@
         let appState = { 
             jobs: [], 
             filter: 'All', 
-            profile: { bizName: "Megson Plastering", realName: "", phone: "", email: "", acc: "", sort: "", logo: "" }
+            profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "", logo: "https://lh3.googleusercontent.com/d/1yvG5nEIdaDtjanVHDJR5hSa0sH3UzV41" }
         };
         
         function calculateDuration(start, end) {
@@ -177,7 +174,7 @@
         }
 
         function init() {
-            const saved = localStorage.getItem('megson_pro_local_v2');
+            const saved = localStorage.getItem('megson_pro_local_v3');
             if(saved) appState = JSON.parse(saved);
             document.getElementById('biz-name').value = appState.profile.bizName || "";
             document.getElementById('user-real-name').value = appState.profile.realName || "";
@@ -185,10 +182,10 @@
             document.getElementById('user-email').value = appState.profile.email || "";
             document.getElementById('user-acc').value = appState.profile.acc || "";
             document.getElementById('user-sort').value = appState.profile.sort || "";
-            refreshLogo(); updateUIBranding(); renderJobs();
+            updateUIBranding(); renderJobs();
         }
 
-        function save() { localStorage.setItem('megson_pro_local_v2', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_pro_local_v3', JSON.stringify(appState)); }
 
         function createNewJob() {
             const name = document.getElementById('new-client').value;
@@ -258,7 +255,14 @@
             const isInvoice = job.status !== "Pending";
             
             doc.setFillColor(0, 51, 102).rect(0, 0, 210, 40, 'F');
-            if(appState.profile.logo) doc.addImage(appState.profile.logo, 'PNG', 15, 5, 30, 30);
+            
+            // Branding from your Google Drive logo
+            if(appState.profile.logo) {
+                try {
+                    doc.addImage(appState.profile.logo, 'PNG', 15, 5, 30, 30);
+                } catch(e) { console.log("Logo load issue, skipping image."); }
+            }
+
             doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 50, 22);
             doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 50, 30);
             
@@ -312,16 +316,6 @@
             document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`[data-status="${status}"]`).classList.add('active');
             renderJobs();
-        }
-        function handleLogoUpload(input) {
-            const reader = new FileReader();
-            reader.onloadend = () => { appState.profile.logo = reader.result; save(); refreshLogo(); };
-            if(input.files[0]) reader.readAsDataURL(input.files[0]);
-        }
-        function refreshLogo() {
-            const logoHtml = appState.profile.logo ? `<img src="${appState.profile.logo}" class="logo-img">` : '';
-            document.getElementById('header-logo-container').innerHTML = logoHtml;
-            document.getElementById('logo-preview').innerHTML = logoHtml;
         }
         function deleteJob() {
             if(confirm("Delete job?")) {
