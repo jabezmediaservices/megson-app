@@ -111,146 +111,140 @@
     </div>
 
     <script>
-        // --- YOUR FIREBASE CONFIG ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyA4pleUqc9x19yQZG48U7sDBErzp8uM3ug",
-            authDomain: "megson-plastering-56218.firebaseapp.com",
-            projectId: "megson-plastering-56218",
-            storageBucket: "megson-plastering-56218.firebasestorage.app",
-            messagingSenderId: "861097926145",
-            appId: "1:861097926145:web:5a60d601818a4978d7aa00"
-        };
+    // --- UPDATED FIREBASE CONFIG WITH NEW KEY ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyA4pleUqc9x19yQZG48U7sDBErzp8uM3ug",
+        authDomain: "megson-plastering-56218.firebaseapp.com",
+        projectId: "megson-plastering-56218",
+        storageBucket: "megson-plastering-56218.firebasestorage.app",
+        messagingSenderId: "861097926145",
+        appId: "1:861097926145:web:5a60d601818a4978d7aa00"
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
 
-        let appState = { jobs: [], profile: { bizName: "Megson Plastering", bank: "" } };
+    let appState = { jobs: [], profile: { bizName: "Megson Plastering", bank: "" } };
 
-        // --- AUTH & SYNC ---
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('login-area').classList.add('hidden');
-                document.getElementById('user-info').classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName;
-                document.getElementById('user-avatar').src = user.photoURL;
-                document.getElementById('sync-indicator').innerText = "Cloud Synced";
-                document.getElementById('sync-indicator').classList.replace('text-red-400', 'text-green-400');
-                loadFromCloud(user.uid);
-            } else {
-                document.getElementById('login-area').classList.remove('hidden');
-                document.getElementById('user-info').classList.add('hidden');
-                document.getElementById('sync-indicator').innerText = "Cloud Offline";
-                document.getElementById('sync-indicator').classList.replace('text-green-400', 'text-red-400');
-            }
+    // --- AUTH & SYNC LOGIC ---
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            document.getElementById('login-area').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('user-name').innerText = user.displayName;
+            document.getElementById('user-avatar').src = user.photoURL;
+            document.getElementById('sync-indicator').innerText = "Cloud Synced";
+            document.getElementById('sync-indicator').className = "text-[10px] font-bold text-green-400 mt-1 uppercase";
+            loadFromCloud(user.uid);
+        } else {
+            document.getElementById('login-area').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            document.getElementById('sync-indicator').innerText = "Cloud Offline";
+            document.getElementById('sync-indicator').className = "text-[10px] font-bold text-red-400 mt-1 uppercase";
+        }
+    });
+
+    async function googleLogin() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        // Force the popup for a clean "handshake"
+        await auth.signInWithPopup(provider).catch(error => {
+            console.error("Login Error:", error.code, error.message);
+            alert("Login Failed: " + error.message);
+        });
+    }
+
+    async function saveToCloud() {
+        const user = auth.currentUser;
+        if (user) await db.collection("users").doc(user.uid).set(appState);
+    }
+
+    async function loadFromCloud(uid) {
+        const doc = await db.collection("users").doc(uid).get();
+        if (doc.exists) { 
+            appState = doc.data(); 
+            if(document.getElementById('biz-name')) document.getElementById('biz-name').value = appState.profile.bizName || "";
+            if(document.getElementById('user-bank')) document.getElementById('user-bank').value = appState.profile.bank || "";
+            renderJobs(); 
+        }
+    }
+
+    // --- JOB & UI HELPERS ---
+    function createNewJob() {
+        const name = document.getElementById('new-client').value;
+        if(!name) return alert("Please enter client name");
+
+        appState.jobs.push({
+            id: Date.now(),
+            client: name,
+            addr1: document.getElementById('new-addr1').value,
+            addr2: document.getElementById('new-addr2').value,
+            city: document.getElementById('new-city').value,
+            postcode: document.getElementById('new-postcode').value,
+            dateFrom: document.getElementById('new-start').value,
+            dateTo: document.getElementById('new-end').value,
+            status: "Pending",
+            value: 0
         });
 
-        async function googleLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            await auth.signInWithPopup(provider);
-        }
+        saveToCloud();
+        renderJobs();
+        closeModal('add-modal');
+        clearAddForm();
+    }
 
-        async function saveToCloud() {
-            const user = auth.currentUser;
-            if (user) await db.collection("users").doc(user.uid).set(appState);
-        }
+    function renderJobs() {
+        const container = document.getElementById('job-list-container');
+        if(!container) return;
+        const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+        
+        const filtered = appState.jobs.filter(job => 
+            job.client.toLowerCase().includes(searchTerm) || 
+            (job.postcode && job.postcode.toLowerCase().includes(searchTerm))
+        );
 
-        async function loadFromCloud(uid) {
-            const doc = await db.collection("users").doc(uid).get();
-            if (doc.exists) { 
-                appState = doc.data(); 
-                document.getElementById('biz-name').value = appState.profile.bizName || "";
-                document.getElementById('user-bank').value = appState.profile.bank || "";
-                renderJobs(); 
-            }
-        }
-
-        // --- JOB LOGIC ---
-        function createNewJob() {
-            const name = document.getElementById('new-client').value;
-            if(!name) return alert("Please enter client name");
-
-            appState.jobs.push({
-                id: Date.now(),
-                client: name,
-                addr1: document.getElementById('new-addr1').value,
-                addr2: document.getElementById('new-addr2').value,
-                city: document.getElementById('new-city').value,
-                postcode: document.getElementById('new-postcode').value,
-                dateFrom: document.getElementById('new-start').value,
-                dateTo: document.getElementById('new-end').value,
-                status: "Pending",
-                value: 0
-            });
-
-            saveToCloud();
-            renderJobs();
-            closeModal('add-modal');
-            clearAddForm();
-        }
-
-        function calculateDuration(start, end) {
-            if(!start || !end) return "Duration TBC";
-            const s = new Date(start);
-            const e = new Date(end);
-            const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
-            return diff > 0 ? `${diff} Day${diff > 1 ? 's' : ''}` : "Invalid Dates";
-        }
-
-        function renderJobs() {
-            const container = document.getElementById('job-list-container');
-            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
-            
-            const filtered = appState.jobs.filter(job => 
-                job.client.toLowerCase().includes(searchTerm) || 
-                job.postcode.toLowerCase().includes(searchTerm)
-            );
-
-            container.innerHTML = filtered.map(job => `
-                <div class="bg-white p-5 rounded-3xl shadow-sm border-l-[12px] border-gray-300">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-black uppercase text-lg text-megson-blue">${job.client}</h3>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
-                        </div>
-                        <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
+        container.innerHTML = filtered.map(job => `
+            <div class="bg-white p-5 rounded-3xl shadow-sm border-l-[12px] border-gray-300">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="font-black uppercase text-lg text-[#003366]">${job.client}</h3>
+                        <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1 || ''}, ${job.postcode || ''}</p>
                     </div>
-                    <div class="flex gap-2 mt-4">
-                        <div class="bg-blue-50 p-2 px-3 rounded-xl">
-                            <p class="text-[8px] font-black text-blue-400 uppercase">Duration</p>
-                            <p class="text-xs font-black text-blue-700">${calculateDuration(job.dateFrom, job.dateTo)}</p>
-                        </div>
-                        <div class="bg-orange-50 p-2 px-3 rounded-xl">
-                            <p class="text-[8px] font-black text-orange-400 uppercase">Start Date</p>
-                            <p class="text-xs font-black text-orange-700">${job.dateFrom || 'TBC'}</p>
-                        </div>
+                    <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <div class="bg-blue-50 p-2 px-3 rounded-xl">
+                        <p class="text-[8px] font-black text-blue-400 uppercase">Start Date</p>
+                        <p class="text-xs font-black text-blue-700">${job.dateFrom || 'TBC'}</p>
                     </div>
                 </div>
-            `).join('');
-        }
+            </div>
+        `).join('');
+    }
 
-        // --- UI HELPERS ---
-        function showSection(id) {
-            ['jobs', 'settings'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
-            document.getElementById('sec-' + id).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-megson-blue'));
-            event.currentTarget.classList.add('active');
-        }
+    function showSection(id) {
+        ['jobs', 'settings'].forEach(s => {
+            const el = document.getElementById('sec-' + s);
+            if(el) el.classList.add('hidden');
+        });
+        const target = document.getElementById('sec-' + id);
+        if(target) target.classList.remove('hidden');
+    }
 
-        function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        
-        function clearAddForm() {
-            ['new-client', 'new-addr1', 'new-addr2', 'new-city', 'new-postcode', 'new-start', 'new-end'].forEach(id => {
-                document.getElementById(id).value = "";
-            });
-        }
+    function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    
+    function clearAddForm() {
+        ['new-client', 'new-addr1', 'new-addr2', 'new-city', 'new-postcode', 'new-start', 'new-end'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = "";
+        });
+    }
 
-        function updateProfile() {
-            appState.profile.bizName = document.getElementById('biz-name').value;
-            appState.profile.bank = document.getElementById('user-bank').value;
-            saveToCloud();
-        }
-    </script>
-</body>
-</html>
+    function updateProfile() {
+        appState.profile.bizName = document.getElementById('biz-name').value;
+        appState.profile.bank = document.getElementById('user-bank').value;
+        saveToCloud();
+    }
+</script>
