@@ -6,6 +6,7 @@
     <title>Megson Plastering Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDyEkmbLWzQFSsdiflMnDZ5qjdntiCpLPE&libraries=places"></script>
     <style>
         :root { --megson-blue: #003366; --megson-orange: #f39c12; }
         .bg-megson-blue { background-color: var(--megson-blue); }
@@ -16,6 +17,7 @@
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
         .logo-img { height: 60px; width: auto; object-fit: contain; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .pac-container { z-index: 9999 !important; border-radius: 1rem; margin-top: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: none; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-32">
@@ -71,28 +73,16 @@
 
         <section id="sec-settings" class="p-4 hidden pb-24">
             <div class="bg-white p-6 rounded-3xl shadow-md space-y-6">
-                <h2 class="text-xl font-black text-megson-blue uppercase italic">Material Rates</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-3 rounded-xl">
-                        <label class="text-[9px] font-black uppercase text-gray-400">Multi-Finish £</label>
-                        <input type="number" id="rate-bag" oninput="updateRates()" class="w-full bg-transparent font-bold">
-                    </div>
-                    <div class="bg-gray-50 p-3 rounded-xl">
-                        <label class="text-[9px] font-black uppercase text-gray-400">Board £</label>
-                        <input type="number" id="rate-board" oninput="updateRates()" class="w-full bg-transparent font-bold">
-                    </div>
-                </div>
-                <hr>
                 <h2 class="text-xl font-black text-megson-blue uppercase italic">Business Setup</h2>
                 <div class="space-y-3">
-                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="Business Name" class="w-full border p-4 rounded-2xl">
-                    <input type="text" id="user-real-name" oninput="updateProfile()" placeholder="Your Name (for bank)" class="w-full border p-4 rounded-2xl">
+                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="Trading Name" class="w-full border p-4 rounded-2xl">
+                    <input type="text" id="user-real-name" oninput="updateProfile()" placeholder="Full Name (for bank)" class="w-full border p-4 rounded-2xl">
                     <div class="grid grid-cols-2 gap-3">
                         <input type="text" id="user-acc" oninput="updateProfile()" placeholder="Account No" class="border p-4 rounded-2xl">
                         <input type="text" id="user-sort" oninput="updateProfile()" placeholder="Sort Code" class="border p-4 rounded-2xl">
                     </div>
-                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Business Phone" class="w-full border p-4 rounded-2xl">
-                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Business Email" class="w-full border p-4 rounded-2xl">
+                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
+                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
                 </div>
                 <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
@@ -110,8 +100,12 @@
             <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
             <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
             <div class="space-y-2">
-                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
-                <input type="text" id="new-city" class="w-full border p-3 rounded-xl text-sm" placeholder="Town/City">
+                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1 (Start typing...)">
+                <input type="text" id="new-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 2">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="new-city" class="border p-3 rounded-xl text-sm" placeholder="Town/City">
+                    <input type="text" id="new-county" class="border p-3 rounded-xl text-sm" placeholder="County">
+                </div>
                 <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
             </div>
             <div class="grid grid-cols-2 gap-2">
@@ -134,7 +128,7 @@
                 </select>
             </div>
             
-            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold" placeholder="Client Name">
+            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold">
             <div class="grid grid-cols-2 gap-2">
                 <input type="tel" id="edit-phone" class="border p-4 rounded-xl text-sm" placeholder="Phone">
                 <input type="email" id="edit-email" class="border p-4 rounded-xl text-sm" placeholder="Email">
@@ -146,11 +140,12 @@
                 <input type="text" id="edit-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 2">
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="edit-city" class="border p-3 rounded-xl text-sm" placeholder="City">
-                    <input type="text" id="edit-postcode" class="border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+                    <input type="text" id="edit-county" class="border p-3 rounded-xl text-sm" placeholder="County">
                 </div>
+                <input type="text" id="edit-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
             </div>
 
-            <div class="grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 gap-2">
                 <div class="bg-gray-50 p-3 rounded-xl">
                     <label class="text-[9px] font-black uppercase text-gray-400">Quote £</label>
                     <input type="number" id="edit-value" class="w-full bg-transparent font-bold">
@@ -158,21 +153,6 @@
                 <div class="bg-gray-50 p-3 rounded-xl text-center">
                     <label class="text-[9px] font-black uppercase text-gray-400">Duration</label>
                     <div id="edit-dur" class="font-black text-sm">--</div>
-                </div>
-                <div class="bg-gray-50 p-3 rounded-xl text-center">
-                    <label class="text-[9px] font-black uppercase text-gray-400">Profit £</label>
-                    <div id="edit-profit" class="font-black text-sm text-green-600">0</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-gray-50 p-3 rounded-xl">
-                    <label class="text-[9px] font-black uppercase text-gray-400">Multi Bags</label>
-                    <input type="number" id="edit-multi" oninput="calcProfit()" class="w-full bg-transparent font-bold">
-                </div>
-                <div class="bg-gray-50 p-3 rounded-xl">
-                    <label class="text-[9px] font-black uppercase text-gray-400">Boards</label>
-                    <input type="number" id="edit-boards" oninput="calcProfit()" class="w-full bg-transparent font-bold">
                 </div>
             </div>
 
@@ -198,23 +178,57 @@
             rates: { bag: 11.50, board: 14.20 },
             profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "", logo: "" }
         };
-        
+
+        let autocompleteAdd, autocompleteEdit;
+
         function init() {
-            const saved = localStorage.getItem('megson_ultimate_local_v1');
+            const saved = localStorage.getItem('megson_ultimate_v4');
             if(saved) appState = JSON.parse(saved);
+            
             document.getElementById('biz-name').value = appState.profile.bizName || "";
             document.getElementById('user-real-name').value = appState.profile.realName || "";
             document.getElementById('user-phone').value = appState.profile.phone || "";
             document.getElementById('user-email').value = appState.profile.email || "";
             document.getElementById('user-acc').value = appState.profile.acc || "";
             document.getElementById('user-sort').value = appState.profile.sort || "";
-            document.getElementById('rate-bag').value = appState.rates.bag;
-            document.getElementById('rate-board').value = appState.rates.board;
+            
             updateUIBranding();
             renderJobs();
+            initAutocomplete();
         }
 
-        function save() { localStorage.setItem('megson_ultimate_local_v1', JSON.stringify(appState)); }
+        function initAutocomplete() {
+            const options = { componentRestrictions: { country: "gb" }, fields: ["address_components", "formatted_address"] };
+            
+            autocompleteAdd = new google.maps.places.Autocomplete(document.getElementById('new-addr1'), options);
+            autocompleteAdd.addListener('place_changed', () => fillInAddress(autocompleteAdd, 'new'));
+
+            autocompleteEdit = new google.maps.places.Autocomplete(document.getElementById('edit-addr1'), options);
+            autocompleteEdit.addListener('place_changed', () => fillInAddress(autocompleteEdit, 'edit'));
+        }
+
+        function fillInAddress(autocomplete, prefix) {
+            const place = autocomplete.getPlace();
+            let streetNumber = '', route = '', city = '', county = '', postcode = '';
+
+            for (const component of place.address_components) {
+                const componentType = component.types[0];
+                switch (componentType) {
+                    case "street_number": streetNumber = component.long_name; break;
+                    case "route": route = component.long_name; break;
+                    case "postal_town": city = component.long_name; break;
+                    case "locality": if(!city) city = component.long_name; break;
+                    case "administrative_area_level_2": county = component.long_name; break;
+                    case "postal_code": postcode = component.long_name; break;
+                }
+            }
+            document.getElementById(`${prefix}-addr1`).value = `${streetNumber} ${route}`.trim();
+            document.getElementById(`${prefix}-city`).value = city;
+            document.getElementById(`${prefix}-county`).value = county;
+            document.getElementById(`${prefix}-postcode`).value = postcode;
+        }
+
+        function save() { localStorage.setItem('megson_ultimate_v4', JSON.stringify(appState)); }
 
         function calculateDuration(start, end) {
             if(!start || !end) return "TBC";
@@ -228,9 +242,13 @@
             if(!name) return alert("Enter client name");
             appState.jobs.push({ 
                 id: Date.now(), client: name, 
-                addr1: document.getElementById('new-addr1').value, addr2: "", city: document.getElementById('new-city').value, postcode: document.getElementById('new-postcode').value,
+                addr1: document.getElementById('new-addr1').value, 
+                addr2: document.getElementById('new-addr2').value, 
+                city: document.getElementById('new-city').value, 
+                county: document.getElementById('new-county').value, 
+                postcode: document.getElementById('new-postcode').value,
                 phone: "", email: "", dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value,
-                status: "Pending", value: 0, multi: 0, boards: 0, notes: "" 
+                status: "Pending", value: 0, notes: "" 
             });
             save(); renderJobs(); closeModal('add-modal');
         }
@@ -241,11 +259,7 @@
             const statusStyle = { "Pending": "border-gray-300", "Invoiced": "border-orange-500", "Completed": "border-green-500" };
 
             container.innerHTML = filtered.map(job => {
-                const matCost = (job.multi * appState.rates.bag) + (job.boards * appState.rates.board);
-                const profit = job.value - matCost;
                 const fullAddr = [job.addr1, job.city, job.postcode].filter(Boolean).join(', ');
-                const dur = calculateDuration(job.dateFrom, job.dateTo);
-                
                 return `
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-l-[12px] ${statusStyle[job.status]}">
                     <div class="flex justify-between items-start mb-4" onclick="openEdit(${job.id})">
@@ -253,20 +267,18 @@
                             <h3 class="font-black text-gray-800 uppercase text-lg leading-tight">${job.client} ✏️</h3>
                             <p class="text-[10px] text-gray-400 font-bold uppercase">${fullAddr || 'No Address'}</p>
                             <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${dur}</span>
-                                <span class="text-[9px] font-black text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase">Profit: £${profit.toFixed(0)}</span>
+                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${calculateDuration(job.dateFrom, job.dateTo)}</span>
+                                <span class="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded uppercase">£${job.value}</span>
                             </div>
                         </div>
                         <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
                     </div>
-                    
                     <div class="grid grid-cols-4 gap-2">
                         <button onclick="window.location.href='tel:${job.phone}'" class="bg-slate-100 p-3 rounded-xl text-[9px] font-black uppercase">📞 Call</button>
                         <button onclick="copyToClipboard('${job.phone}')" class="bg-slate-100 p-3 rounded-xl text-[9px] font-black uppercase">📋 Copy</button>
                         <button onclick="emailQuote(${job.id})" class="bg-orange-100 text-orange-600 p-3 rounded-xl text-[9px] font-black uppercase">📧 Email</button>
                         <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-3 rounded-xl text-[9px] font-black uppercase">📄 PDF</button>
                     </div>
-                    <button onclick="addToCalendar(${job.id})" class="w-full mt-2 bg-green-600 text-white p-2 rounded-xl text-[9px] font-black uppercase font-bold">📅 Add to Calendar</button>
                 </div>`;
             }).join('');
         }
@@ -278,18 +290,16 @@
             document.getElementById('edit-addr1').value = job.addr1 || '';
             document.getElementById('edit-addr2').value = job.addr2 || '';
             document.getElementById('edit-city').value = job.city || '';
+            document.getElementById('edit-county').value = job.county || '';
             document.getElementById('edit-postcode').value = job.postcode || '';
             document.getElementById('edit-phone').value = job.phone || '';
             document.getElementById('edit-email').value = job.email || '';
             document.getElementById('edit-value').value = job.value || 0;
-            document.getElementById('edit-multi').value = job.multi || 0;
-            document.getElementById('edit-boards').value = job.boards || 0;
             document.getElementById('edit-start').value = job.dateFrom || '';
             document.getElementById('edit-end').value = job.dateTo || '';
             document.getElementById('edit-notes').value = job.notes || '';
             document.getElementById('edit-status').value = job.status;
             updateEditDur();
-            calcProfit();
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
@@ -299,12 +309,11 @@
             job.addr1 = document.getElementById('edit-addr1').value;
             job.addr2 = document.getElementById('edit-addr2').value;
             job.city = document.getElementById('edit-city').value;
+            job.county = document.getElementById('edit-county').value;
             job.postcode = document.getElementById('edit-postcode').value;
             job.phone = document.getElementById('edit-phone').value;
             job.email = document.getElementById('edit-email').value;
             job.value = parseFloat(document.getElementById('edit-value').value) || 0;
-            job.multi = parseInt(document.getElementById('edit-multi').value) || 0;
-            job.boards = parseInt(document.getElementById('edit-boards').value) || 0;
             job.dateFrom = document.getElementById('edit-start').value;
             job.dateTo = document.getElementById('edit-end').value;
             job.notes = document.getElementById('edit-notes').value;
@@ -313,38 +322,38 @@
         }
 
         function updateEditDur() {
-            const s = document.getElementById('edit-start').value;
-            const e = document.getElementById('edit-end').value;
+            const s = document.getElementById('edit-start').value, e = document.getElementById('edit-end').value;
             document.getElementById('edit-dur').innerText = calculateDuration(s, e);
-        }
-
-        function calcProfit() {
-            const val = parseFloat(document.getElementById('edit-value').value) || 0;
-            const multi = parseInt(document.getElementById('edit-multi').value) || 0;
-            const boards = parseInt(document.getElementById('edit-boards').value) || 0;
-            const cost = (multi * appState.rates.bag) + (boards * appState.rates.board);
-            document.getElementById('edit-profit').innerText = (val - cost).toFixed(2);
         }
 
         async function downloadPDF(jobId) {
             const job = appState.jobs.find(j => j.id === jobId);
             const doc = new jspdf.jsPDF();
             const isInvoice = job.status !== "Pending";
+            
             doc.setFillColor(0, 51, 102).rect(0, 0, 210, 40, 'F');
             doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 50, 22);
             doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 50, 30);
+            
             doc.setTextColor(0).setFontSize(18).text(isInvoice ? 'INVOICE' : 'QUOTATION', 20, 60);
             doc.setFontSize(10).text(`To: ${job.client}`, 20, 75);
-            doc.text(`Site Address: ${job.addr1}, ${job.city}, ${job.postcode}`, 20, 80);
-            doc.text(`Estimated Dates: ${job.dateFrom} to ${job.dateTo}`, 20, 85);
-            doc.setFontSize(12).setFont(undefined, 'bold').text(`Total Amount: £${job.value.toFixed(2)}`, 20, 105);
+            
+            let y = 80;
+            doc.text(`Site Address:`, 20, y);
+            doc.text(`${job.addr1}${job.addr2 ? ', ' + job.addr2 : ''}`, 45, y); y += 5;
+            doc.text(`${job.city}, ${job.county}`, 45, y); y += 5;
+            doc.text(`${job.postcode}`, 45, y); y += 10;
+            
+            doc.text(`Dates: ${job.dateFrom} to ${job.dateTo}`, 20, y);
+            doc.setFontSize(12).setFont(undefined, 'bold').text(`Total Amount: £${job.value.toFixed(2)}`, 20, y + 15);
+            
             if(isInvoice && appState.profile.acc) {
-                doc.setDrawColor(200).line(20, 120, 190, 120);
-                doc.setFontSize(10).text('PAYMENT DETAILS', 20, 130);
+                doc.setDrawColor(200).line(20, 130, 190, 130);
+                doc.setFontSize(10).text('PAYMENT DETAILS', 20, 140);
                 doc.setFontSize(9).setFont(undefined, 'normal');
-                doc.text(`Account Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 138);
-                doc.text(`Account Number: ${appState.profile.acc}`, 20, 144);
-                doc.text(`Sort Code: ${appState.profile.sort}`, 20, 150);
+                doc.text(`Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 148);
+                doc.text(`Account: ${appState.profile.acc}`, 20, 154);
+                doc.text(`Sort Code: ${appState.profile.sort}`, 20, 160);
             }
             doc.save(`${isInvoice ? 'Invoice' : 'Quote'}_${job.client}.pdf`);
         }
@@ -356,20 +365,9 @@
             window.location.href = `mailto:${job.email}?subject=${type} for ${job.addr1}&body=${body}`;
         }
 
-        function addToCalendar(id) {
-            const job = appState.jobs.find(j => j.id === id);
-            if(!job.dateFrom) return alert("Set a start date first!");
-            const format = (d) => d.replace(/-/g, '');
-            const icsData = ["BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT", `DTSTART:${format(job.dateFrom)}T080000`, `DTEND:${format(job.dateTo || job.dateFrom)}T170000`, `SUMMARY:Plastering: ${job.client}`, `LOCATION:${job.addr1}, ${job.postcode}`, "END:VEVENT", "END:VCALENDAR"].join("\n");
-            const blob = new Blob([icsData], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `job_${job.client}.ics`; a.click();
-        }
-
         function copyToClipboard(text) {
             if(!text) return alert("No number set");
-            navigator.clipboard.writeText(text);
-            alert("Copied to clipboard!");
+            navigator.clipboard.writeText(text); alert("Copied!");
         }
 
         function updateProfile() {
@@ -380,12 +378,6 @@
             appState.profile.acc = document.getElementById('user-acc').value;
             appState.profile.sort = document.getElementById('user-sort').value;
             updateUIBranding(); save();
-        }
-
-        function updateRates() {
-            appState.rates.bag = parseFloat(document.getElementById('rate-bag').value) || 0;
-            appState.rates.board = parseFloat(document.getElementById('rate-board').value) || 0;
-            save(); renderJobs();
         }
 
         function updateUIBranding() { if(appState.profile.phone) document.getElementById('header-phone').innerText = appState.profile.phone; }
@@ -402,7 +394,7 @@
             renderJobs();
         }
         function deleteJob() {
-            if(confirm("Delete job?")) {
+            if(confirm("Delete?")) {
                 appState.jobs = appState.jobs.filter(j => j.id !== appState.currentEditId);
                 save(); renderJobs(); closeModal('edit-modal');
             }
@@ -417,7 +409,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `megson_backup.json`); dl.click();
         }
-        init();
+        window.onload = init;
     </script>
 </body>
 </html>
