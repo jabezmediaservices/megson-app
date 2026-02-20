@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering Pro</title>
+    <title>Megson Plastering</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -26,7 +26,7 @@
                 <div id="header-logo-container"></div>
                 <div class="flex flex-col">
                     <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
-                    <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">07955 315849</span>
+                    <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">PRO</span>
                 </div>
             </div>
             <button onclick="showSection('settings')" class="text-3xl bg-white/10 p-2 rounded-xl">⚙️</button>
@@ -39,7 +39,7 @@
 
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 <button onclick="setFilter('All')" class="filter-pill active px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="All">ALL</button>
-                <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="Pending">QUOTES</button>
+                <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-gray-400" data-status="Pending">QUOTES</button>
                 <button onclick="setFilter('Invoiced')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-orange-500" data-status="Invoiced">INVOICED</button>
                 <button onclick="setFilter('Completed')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-green-500" data-status="Completed">PAID</button>
             </div>
@@ -71,17 +71,34 @@
             <div class="bg-white p-6 rounded-3xl shadow-md space-y-6">
                 <h2 class="text-xl font-black text-megson-blue uppercase italic">Business Setup</h2>
                 <div class="space-y-3">
-                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="Business Name" class="w-full border p-4 rounded-2xl">
-                    <input type="text" id="user-bank" oninput="updateProfile()" placeholder="Bank Details (Acc/Sort)" class="w-full border p-4 rounded-2xl">
-                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Business Phone" class="w-full border p-4 rounded-2xl">
-                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Business Email" class="w-full border p-4 rounded-2xl">
+                    <label class="text-[10px] font-black uppercase text-gray-400">Trading Name</label>
+                    <input type="text" id="biz-name" oninput="updateProfile()" placeholder="e.g. Megson Plastering" class="w-full border p-4 rounded-2xl">
+                    
+                    <label class="text-[10px] font-black uppercase text-gray-400">Full Name (For Payments)</label>
+                    <input type="text" id="user-real-name" oninput="updateProfile()" placeholder="e.g. Paul Megson" class="w-full border p-4 rounded-2xl">
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Account Number</label>
+                            <input type="text" id="user-acc" oninput="updateProfile()" placeholder="12345678" class="w-full border p-4 rounded-2xl">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-gray-400">Sort Code</label>
+                            <input type="text" id="user-sort" oninput="updateProfile()" placeholder="00-00-00" class="w-full border p-4 rounded-2xl">
+                        </div>
+                    </div>
+
+                    <label class="text-[10px] font-black uppercase text-gray-400">Contact Details</label>
+                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
+                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
                 </div>
+                
                 <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-gray-200 text-center">
                     <input type="file" id="logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
                     <button onclick="document.getElementById('logo-upload').click()" class="bg-white border px-4 py-2 rounded-lg text-xs font-bold shadow-sm">Change Logo</button>
                     <div id="logo-preview" class="mt-2 flex justify-center"></div>
                 </div>
-                <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data to Phone</button>
+                <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
         </section>
 
@@ -93,13 +110,11 @@
     </div>
 
     <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3">
             <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
             <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
-            <div class="space-y-2">
-                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
-                <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
-            </div>
+            <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address">
+            <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
             <div class="grid grid-cols-2 gap-2">
                 <input type="date" id="new-start" class="w-full border p-3 rounded-xl text-sm">
                 <input type="date" id="new-end" class="w-full border p-3 rounded-xl text-sm">
@@ -119,35 +134,24 @@
                     <option value="Completed">PAID</option>
                 </select>
             </div>
-            
-            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold" placeholder="Client Name">
-            <input type="email" id="edit-email" class="w-full border p-4 rounded-xl text-sm" placeholder="Client Email">
-
-            <div class="space-y-2 border-y py-3">
-                <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 1">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="edit-city" class="border p-3 rounded-xl text-sm" placeholder="City">
-                    <input type="text" id="edit-postcode" class="border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
-                </div>
-            </div>
-            
+            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold">
+            <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm">
+            <input type="text" id="edit-postcode" class="w-full border p-3 rounded-xl text-sm uppercase">
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="text-[9px] font-black uppercase text-gray-400">Quote/Invoice £</label>
+                    <label class="text-[9px] font-black uppercase text-gray-400">Total Amount £</label>
                     <input type="number" id="edit-value" class="w-full border p-3 rounded-xl font-bold">
                 </div>
                 <div>
-                    <label class="text-[9px] font-black uppercase text-gray-400">Duration (Auto)</label>
-                    <div id="edit-duration-display" class="w-full bg-gray-50 p-3 rounded-xl font-black text-sm text-blue-600 text-center">--</div>
+                    <label class="text-[9px] font-black uppercase text-gray-400">Days</label>
+                    <div id="edit-duration-display" class="w-full bg-gray-50 p-3 rounded-xl font-black text-center text-sm">--</div>
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-2">
                 <input type="date" id="edit-start" oninput="updateDurationUI()" class="w-full border p-3 rounded-xl text-sm">
                 <input type="date" id="edit-end" oninput="updateDurationUI()" class="w-full border p-3 rounded-xl text-sm">
             </div>
-
-            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg">Save Changes</button>
+            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase">Save Changes</button>
             <button onclick="closeModal('edit-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
             <button onclick="deleteJob()" class="w-full text-red-500 font-black uppercase text-[10px]">Delete Job</button>
         </div>
@@ -157,46 +161,42 @@
         let appState = { 
             jobs: [], 
             filter: 'All', 
-            profile: { bizName: "Megson Plastering", phone: "07955 315849", email: "paul.megson@hotmail.com", bank: "", logo: "" }
+            profile: { bizName: "Megson Plastering", realName: "", phone: "", email: "", acc: "", sort: "", logo: "" }
         };
         
         function calculateDuration(start, end) {
             if(!start || !end) return "TBC";
-            const s = new Date(start);
-            const e = new Date(end);
+            const s = new Date(start), e = new Date(end);
             const diff = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
             return diff > 0 ? `${diff} Day${diff > 1 ? 's' : ''}` : "Invalid";
         }
 
         function updateDurationUI() {
-            const s = document.getElementById('edit-start').value;
-            const e = document.getElementById('edit-end').value;
+            const s = document.getElementById('edit-start').value, e = document.getElementById('edit-end').value;
             document.getElementById('edit-duration-display').innerText = calculateDuration(s, e);
         }
 
         function init() {
-            const saved = localStorage.getItem('megson_pro_local');
+            const saved = localStorage.getItem('megson_pro_local_v2');
             if(saved) appState = JSON.parse(saved);
             document.getElementById('biz-name').value = appState.profile.bizName || "";
+            document.getElementById('user-real-name').value = appState.profile.realName || "";
             document.getElementById('user-phone').value = appState.profile.phone || "";
             document.getElementById('user-email').value = appState.profile.email || "";
-            document.getElementById('user-bank').value = appState.profile.bank || "";
-            refreshLogo();
-            updateUIBranding();
-            renderJobs();
+            document.getElementById('user-acc').value = appState.profile.acc || "";
+            document.getElementById('user-sort').value = appState.profile.sort || "";
+            refreshLogo(); updateUIBranding(); renderJobs();
         }
 
-        function save() { localStorage.setItem('megson_pro_local', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_pro_local_v2', JSON.stringify(appState)); }
 
         function createNewJob() {
             const name = document.getElementById('new-client').value;
             if(!name) return alert("Enter client name");
             appState.jobs.push({ 
-                id: Date.now(), client: name, 
-                addr1: document.getElementById('new-addr1').value, 
+                id: Date.now(), client: name, addr1: document.getElementById('new-addr1').value, 
                 postcode: document.getElementById('new-postcode').value,
-                dateFrom: document.getElementById('new-start').value, 
-                dateTo: document.getElementById('new-end').value,
+                dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value,
                 status: "Pending", value: 0 
             });
             save(); renderJobs(); closeModal('add-modal');
@@ -207,45 +207,37 @@
             const filtered = appState.jobs.filter(j => appState.filter === 'All' || j.status === appState.filter);
             const statusStyle = { "Pending": "border-gray-300", "Invoiced": "border-orange-500", "Completed": "border-green-500" };
 
-            container.innerHTML = filtered.map(job => {
-                const duration = calculateDuration(job.dateFrom, job.dateTo);
-                const typeLabel = (job.status === "Pending") ? "QUOTE" : "INVOICE";
-                
-                return `
+            container.innerHTML = filtered.map(job => `
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-l-[12px] ${statusStyle[job.status]}">
                     <div class="flex justify-between items-start mb-4" onclick="openEdit(${job.id})">
                         <div>
                             <h3 class="font-black text-gray-800 uppercase text-lg leading-tight">${job.client} ✏️</h3>
                             <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
                             <div class="flex gap-2 mt-2">
-                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${duration}</span>
+                                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${calculateDuration(job.dateFrom, job.dateTo)}</span>
                                 <span class="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded uppercase">£${job.value}</span>
                             </div>
                         </div>
                         <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-3 rounded-xl text-[9px] font-black uppercase">📄 Get ${typeLabel}</button>
-                        <button onclick="addToCalendar(${job.id})" class="bg-green-600 text-white p-3 rounded-xl text-[9px] font-black uppercase">📅 Add to Cal</button>
+                        <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-3 rounded-xl text-[9px] font-black uppercase">📄 PDF</button>
+                        <button onclick="addToCalendar(${job.id})" class="bg-green-600 text-white p-3 rounded-xl text-[9px] font-black uppercase">📅 Calendar</button>
                     </div>
-                </div>`;
-            }).join('');
+                </div>`).join('');
         }
 
         function openEdit(id) {
             const job = appState.jobs.find(j => j.id === id);
             appState.currentEditId = id;
             document.getElementById('edit-client').value = job.client;
-            document.getElementById('edit-addr1').value = job.addr1 || '';
-            document.getElementById('edit-postcode').value = job.postcode || '';
-            document.getElementById('edit-email').value = job.email || '';
-            document.getElementById('edit-value').value = job.value || 0;
-            document.getElementById('edit-start').value = job.dateFrom || '';
-            document.getElementById('edit-end').value = job.dateTo || '';
+            document.getElementById('edit-addr1').value = job.addr1;
+            document.getElementById('edit-postcode').value = job.postcode;
+            document.getElementById('edit-value').value = job.value;
+            document.getElementById('edit-start').value = job.dateFrom;
+            document.getElementById('edit-end').value = job.dateTo;
             document.getElementById('edit-status').value = job.status;
-            updateDurationUI();
-            document.getElementById('edit-modal').classList.remove('hidden');
+            updateDurationUI(); document.getElementById('edit-modal').classList.remove('hidden');
         }
 
         function saveEdit() {
@@ -253,7 +245,6 @@
             job.client = document.getElementById('edit-client').value;
             job.addr1 = document.getElementById('edit-addr1').value;
             job.postcode = document.getElementById('edit-postcode').value;
-            job.email = document.getElementById('edit-email').value;
             job.value = parseFloat(document.getElementById('edit-value').value) || 0;
             job.dateFrom = document.getElementById('edit-start').value;
             job.dateTo = document.getElementById('edit-end').value;
@@ -274,14 +265,18 @@
             doc.setTextColor(0).setFontSize(18).text(isInvoice ? 'INVOICE' : 'QUOTATION', 20, 60);
             doc.setFontSize(10).text(`To: ${job.client}`, 20, 75);
             doc.text(`Site: ${job.addr1}, ${job.postcode}`, 20, 80);
-            doc.text(`Dates: ${job.dateFrom} to ${job.dateTo}`, 20, 85);
+            doc.text(`Project Dates: ${job.dateFrom} to ${job.dateTo}`, 20, 85);
             
             doc.setFontSize(12).setFont(undefined, 'bold').text(`Total Amount: £${job.value.toFixed(2)}`, 20, 105);
             
-            if(isInvoice && appState.profile.bank) {
-                doc.setFontSize(9).setFont(undefined, 'normal').text(`Payment Info: ${appState.profile.bank}`, 20, 130);
+            if(isInvoice && (appState.profile.acc || appState.profile.sort)) {
+                doc.setDrawColor(200).line(20, 120, 190, 120);
+                doc.setFontSize(10).text('PAYMENT DETAILS', 20, 130);
+                doc.setFontSize(9).setFont(undefined, 'normal');
+                doc.text(`Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 138);
+                doc.text(`Account Number: ${appState.profile.acc}`, 20, 144);
+                doc.text(`Sort Code: ${appState.profile.sort}`, 20, 150);
             }
-            
             doc.save(`${isInvoice ? 'Invoice' : 'Quote'}_${job.client}.pdf`);
         }
 
@@ -289,14 +284,7 @@
             const job = appState.jobs.find(j => j.id === id);
             if(!job.dateFrom) return alert("Set a start date first!");
             const format = (d) => d.replace(/-/g, '');
-            const icsData = [
-                "BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT",
-                `DTSTART:${format(job.dateFrom)}T080000`,
-                `DTEND:${format(job.dateTo || job.dateFrom)}T170000`,
-                `SUMMARY:Plastering: ${job.client}`,
-                `LOCATION:${job.addr1}, ${job.postcode}`,
-                "END:VEVENT", "END:VCALENDAR"
-            ].join("\n");
+            const icsData = ["BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT", `DTSTART:${format(job.dateFrom)}T080000`, `DTEND:${format(job.dateTo || job.dateFrom)}T170000`, `SUMMARY:Plastering: ${job.client}`, `LOCATION:${job.addr1}, ${job.postcode}`, "END:VEVENT", "END:VCALENDAR"].join("\n");
             const blob = new Blob([icsData], { type: 'text/calendar' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = `job_${job.client}.ics`; a.click();
@@ -304,13 +292,15 @@
 
         function updateProfile() {
             appState.profile.bizName = document.getElementById('biz-name').value;
+            appState.profile.realName = document.getElementById('user-real-name').value;
             appState.profile.phone = document.getElementById('user-phone').value;
             appState.profile.email = document.getElementById('user-email').value;
-            appState.profile.bank = document.getElementById('user-bank').value;
+            appState.profile.acc = document.getElementById('user-acc').value;
+            appState.profile.sort = document.getElementById('user-sort').value;
             updateUIBranding(); save();
         }
 
-        function updateUIBranding() { document.getElementById('header-phone').innerText = appState.profile.phone; }
+        function updateUIBranding() { if(appState.profile.phone) document.getElementById('header-phone').innerText = appState.profile.phone; }
         function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function showSection(id) {
