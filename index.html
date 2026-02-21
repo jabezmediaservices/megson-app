@@ -6,7 +6,6 @@
     <title>Megson Plastering Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AlzaSyDyEkmbLWzQFSsdiflMnDZ5qjdntiCpLPE&libraries=places"></script>
     <style>
         :root { --megson-blue: #003366; --megson-orange: #f39c12; }
         .bg-megson-blue { background-color: var(--megson-blue); }
@@ -17,7 +16,6 @@
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
         .logo-img { height: 60px; width: auto; object-fit: contain; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .pac-container { z-index: 9999 !important; border-radius: 1rem; margin-top: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: none; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-32">
@@ -37,7 +35,7 @@
         </header>
 
         <section id="sec-jobs" class="p-4 space-y-4">
-            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg flex justify-center items-center gap-2 mb-2">
+            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mb-2">
                 ➕ Add New Job
             </button>
 
@@ -59,11 +57,11 @@
                     <div class="text-center"><label class="text-[9px] text-gray-400 font-bold block mb-1">H (m)</label><input type="number" id="pro-H" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-blue-50 p-6 rounded-3xl text-center border-b-4 border-blue-200">
+                    <div class="bg-blue-50 p-6 rounded-3xl text-center">
                         <span class="text-[10px] uppercase font-black text-blue-400">Boards</span>
                         <div id="res-boards" class="text-4xl font-black text-megson-blue">0</div>
                     </div>
-                    <div class="bg-orange-50 p-6 rounded-3xl text-center border-b-4 border-orange-200">
+                    <div class="bg-orange-50 p-6 rounded-3xl text-center">
                         <span class="text-[10px] uppercase font-black text-orange-400">Multi Bags</span>
                         <div id="res-multi" class="text-4xl font-black text-orange-600">0</div>
                     </div>
@@ -81,8 +79,8 @@
                         <input type="text" id="user-acc" oninput="updateProfile()" placeholder="Account No" class="border p-4 rounded-2xl">
                         <input type="text" id="user-sort" oninput="updateProfile()" placeholder="Sort Code" class="border p-4 rounded-2xl">
                     </div>
-                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
-                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
+                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Business Phone" class="w-full border p-4 rounded-2xl">
+                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Business Email" class="w-full border p-4 rounded-2xl">
                 </div>
                 <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
@@ -99,8 +97,10 @@
         <div class="bg-white w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
             <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
+            
             <div class="space-y-2">
-                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1 (Start typing...)">
+                <p class="text-[10px] font-black text-gray-400 uppercase">Site Address</p>
+                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
                 <input type="text" id="new-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 2">
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="new-city" class="border p-3 rounded-xl text-sm" placeholder="Town/City">
@@ -108,11 +108,12 @@
                 </div>
                 <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
             </div>
+
             <div class="grid grid-cols-2 gap-2">
                 <input type="date" id="new-start" class="border p-3 rounded-xl text-sm">
                 <input type="date" id="new-end" class="border p-3 rounded-xl text-sm">
             </div>
-            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg">Create Job</button>
+            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Create Job</button>
             <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
         </div>
     </div>
@@ -163,7 +164,7 @@
 
             <textarea id="edit-notes" class="w-full border p-4 rounded-xl h-20 text-sm" placeholder="Notes..."></textarea>
             
-            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg">Save Changes</button>
+            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase">Save Changes</button>
             <div class="flex justify-between items-center px-2">
                 <button onclick="closeModal('edit-modal')" class="text-gray-400 font-bold">Cancel</button>
                 <button onclick="deleteJob()" class="text-red-500 font-black text-[10px] uppercase">Delete Job</button>
@@ -175,14 +176,11 @@
         let appState = { 
             jobs: [], 
             filter: 'All', 
-            rates: { bag: 11.50, board: 14.20 },
-            profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "", logo: "" }
+            profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "" }
         };
 
-        let autocompleteAdd, autocompleteEdit;
-
         function init() {
-            const saved = localStorage.getItem('megson_ultimate_v4');
+            const saved = localStorage.getItem('megson_v5_no_api');
             if(saved) appState = JSON.parse(saved);
             
             document.getElementById('biz-name').value = appState.profile.bizName || "";
@@ -194,41 +192,9 @@
             
             updateUIBranding();
             renderJobs();
-            initAutocomplete();
         }
 
-        function initAutocomplete() {
-            const options = { componentRestrictions: { country: "gb" }, fields: ["address_components", "formatted_address"] };
-            
-            autocompleteAdd = new google.maps.places.Autocomplete(document.getElementById('new-addr1'), options);
-            autocompleteAdd.addListener('place_changed', () => fillInAddress(autocompleteAdd, 'new'));
-
-            autocompleteEdit = new google.maps.places.Autocomplete(document.getElementById('edit-addr1'), options);
-            autocompleteEdit.addListener('place_changed', () => fillInAddress(autocompleteEdit, 'edit'));
-        }
-
-        function fillInAddress(autocomplete, prefix) {
-            const place = autocomplete.getPlace();
-            let streetNumber = '', route = '', city = '', county = '', postcode = '';
-
-            for (const component of place.address_components) {
-                const componentType = component.types[0];
-                switch (componentType) {
-                    case "street_number": streetNumber = component.long_name; break;
-                    case "route": route = component.long_name; break;
-                    case "postal_town": city = component.long_name; break;
-                    case "locality": if(!city) city = component.long_name; break;
-                    case "administrative_area_level_2": county = component.long_name; break;
-                    case "postal_code": postcode = component.long_name; break;
-                }
-            }
-            document.getElementById(`${prefix}-addr1`).value = `${streetNumber} ${route}`.trim();
-            document.getElementById(`${prefix}-city`).value = city;
-            document.getElementById(`${prefix}-county`).value = county;
-            document.getElementById(`${prefix}-postcode`).value = postcode;
-        }
-
-        function save() { localStorage.setItem('megson_ultimate_v4', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_v5_no_api', JSON.stringify(appState)); }
 
         function calculateDuration(start, end) {
             if(!start || !end) return "TBC";
@@ -340,7 +306,8 @@
             
             let y = 80;
             doc.text(`Site Address:`, 20, y);
-            doc.text(`${job.addr1}${job.addr2 ? ', ' + job.addr2 : ''}`, 45, y); y += 5;
+            doc.text(`${job.addr1}`, 45, y); y += 5;
+            if(job.addr2) { doc.text(`${job.addr2}`, 45, y); y += 5; }
             doc.text(`${job.city}, ${job.county}`, 45, y); y += 5;
             doc.text(`${job.postcode}`, 45, y); y += 10;
             
