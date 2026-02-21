@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering Pro</title>
+    <title>Megson Pro</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
@@ -28,7 +28,7 @@
             <div class="flex items-center gap-3">
                 <img src="logo.png" class="logo-img" alt="Logo" onerror="this.src='https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png'">
                 <div class="flex flex-col">
-                    <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
+                    <span class="logo-font text-2xl uppercase leading-none">Megson Pro</span>
                     <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">07955 315849</span>
                 </div>
             </div>
@@ -36,59 +36,50 @@
         </header>
 
         <section id="sec-jobs" class="p-4 space-y-4">
-            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mb-2">➕ New Project</button>
+            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mb-2">➕ Add New Job</button>
             <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="setFilter('All')" class="filter-pill active px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="All">ALL</button>
-                <button onclick="setFilter('Pending')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black" data-status="Pending">QUOTES</button>
-                <button onclick="setFilter('Invoiced')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-orange-500" data-status="Invoiced">INVOICED</button>
-                <button onclick="setFilter('Completed')" class="filter-pill px-5 py-2 rounded-full border bg-white text-[10px] font-black text-green-500" data-status="Completed">PAID</button>
+                <button onclick="setFilter('All')" class="filter-pill active px-4 py-2 rounded-full border bg-white text-[10px] font-black shrink-0" data-status="All">ALL</button>
+                <button onclick="setFilter('Not Started')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-black text-gray-500 shrink-0" data-status="Not Started">NOT STARTED</button>
+                <button onclick="setFilter('In Progress')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-black text-blue-500 shrink-0" data-status="In Progress">IN PROGRESS</button>
+                <button onclick="setFilter('Completed')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-black text-green-500 shrink-0" data-status="Completed">COMPLETED</button>
+                <button onclick="setFilter('Past')" class="filter-pill px-4 py-2 rounded-full border bg-white text-[10px] font-black text-red-500 shrink-0" data-status="Past">PAST</button>
             </div>
             <div id="job-list-container" class="space-y-4"></div>
         </section>
 
         <section id="sec-pro-calc" class="p-4 hidden pb-10">
             <div class="bg-white p-6 rounded-3xl shadow-md border-t-8 border-megson-blue space-y-6">
-                <h2 class="text-xl font-black text-megson-blue uppercase italic">Advanced Estimator</h2>
+                <h2 class="text-xl font-black text-megson-blue uppercase italic">Plastering Estimator</h2>
                 
                 <div class="grid grid-cols-3 gap-3">
-                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Length (m)</label><input type="number" id="calc-L" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
-                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Width (m)</label><input type="number" id="calc-W" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
-                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Height (m)</label><input type="number" id="calc-H" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
+                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Room Length (m)</label><input type="number" id="calc-L" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
+                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Room Width (m)</label><input type="number" id="calc-W" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
+                    <div class="text-center"><label class="text-[9px] font-black text-gray-400 uppercase">Room Height (m)</label><input type="number" id="calc-H" class="w-full border p-3 rounded-xl text-center font-bold" oninput="runAdvancedCalc()"></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 border-y py-4">
-                    <div>
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Day Rate (£)</label>
-                        <input type="number" id="calc-day-rate" value="200" class="w-full border p-3 rounded-xl font-bold" oninput="runAdvancedCalc()">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black text-gray-400 uppercase">Waste (%)</label>
-                        <input type="number" id="calc-waste" value="10" class="w-full border p-3 rounded-xl font-bold" oninput="runAdvancedCalc()">
-                    </div>
+                    <div><label class="text-[9px] font-black text-gray-400 uppercase">Waste Allowance (%)</label><input type="number" id="calc-waste" value="10" class="w-full border p-3 rounded-xl font-bold" oninput="runAdvancedCalc()"></div>
+                    <div><label class="text-[9px] font-black text-gray-400 uppercase">Your Day Rate (£)</label><input type="number" id="calc-day-rate" value="200" class="w-full border p-3 rounded-xl font-bold" oninput="runAdvancedCalc()"></div>
                 </div>
 
-                <div class="space-y-2">
-                    <p class="text-[10px] font-black text-gray-400 uppercase">Unit Prices (£)</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="price-board" placeholder="Board (£)" value="12.50" class="border p-2 rounded-lg text-sm" oninput="runAdvancedCalc()">
-                        <input type="number" id="price-bag" placeholder="Multi (£)" value="8.50" class="border p-2 rounded-lg text-sm" oninput="runAdvancedCalc()">
-                    </div>
+                <div class="space-y-3">
+                    <p class="text-[10px] font-black text-gray-400 uppercase">Material Unit Prices (£)</p>
+                    <div><label class="text-[9px] font-bold text-gray-600 block mb-1">Price per Plasterboard (£)</label><input type="number" id="price-board" value="12.50" class="w-full border p-3 rounded-lg text-sm font-bold" oninput="runAdvancedCalc()"></div>
+                    <div><label class="text-[9px] font-bold text-gray-600 block mb-1">Price per Multi-Finish Bag (£)</label><input type="number" id="price-bag" value="8.50" class="w-full border p-3 rounded-lg text-sm font-bold" oninput="runAdvancedCalc()"></div>
                 </div>
 
                 <div class="bg-gray-50 p-4 rounded-2xl space-y-3">
-                    <div class="flex justify-between text-xs font-bold border-b pb-2"><span>Item</span><span>Qty</span><span>Cost</span></div>
+                    <div class="flex justify-between text-xs font-bold border-b pb-2"><span>Item</span><span>Qty needed</span><span>Est. Cost</span></div>
                     <div class="flex justify-between text-sm"><span>Plasterboards</span><span id="res-boards">0</span><span id="cost-boards">£0</span></div>
                     <div class="flex justify-between text-sm"><span>Multi-Finish Bags</span><span id="res-bags">0</span><span id="cost-bags">£0</span></div>
-                    <div class="flex justify-between text-sm font-bold text-blue-600"><span>Total Materials</span><span>-</span><span id="res-total-mats">£0</span></div>
+                    <div class="flex justify-between text-sm font-bold text-blue-600 mt-2 border-t pt-2"><span>Total Materials Cost</span><span></span><span id="res-total-mats">£0</span></div>
                 </div>
 
                 <div class="bg-megson-blue p-6 rounded-2xl text-white text-center">
-                    <p class="text-[10px] uppercase font-bold opacity-70">Estimated Total Quote</p>
+                    <p class="text-[10px] uppercase font-bold opacity-70">Estimated Quote</p>
                     <div id="res-final-total" class="text-4xl font-black">£0</div>
-                    <p class="text-[9px] mt-1 italic">Incl. Labor + Materials + Waste</p>
+                    <p class="text-[9px] mt-1 italic">Incl. Est. Labor + Materials</p>
                 </div>
-
-                <button onclick="applyCalcToActiveJob()" class="w-full bg-orange-500 text-white p-4 rounded-xl font-black uppercase shadow-lg">Apply to Current Project</button>
             </div>
         </section>
 
@@ -109,40 +100,99 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-4 z-40 shadow-2xl h-24">
             <button onclick="showSection('jobs')" class="tab-btn active flex flex-col items-center text-[10px] font-black"><span class="text-3xl">📁</span>Jobs</button>
-            <button onclick="showSection('pro-calc')" class="tab-btn flex flex-col items-center text-[10px] font-black text-gray-400"><span class="text-3xl">🧮</span>Calc</button>
+            <button onclick="showSection('pro-calc')" class="tab-btn flex flex-col items-center text-[10px] font-black text-gray-400"><span class="text-3xl">🧮</span>Plaster Calc</button>
             <button onclick="showSection('settings')" class="tab-btn flex flex-col items-center text-[10px] font-black text-gray-400"><span class="text-3xl">⚙️</span>Setup</button>
         </nav>
     </div>
 
-    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-3 max-h-[90vh] overflow-y-auto">
-        <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
-        <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
-        <div class="space-y-2">
-            <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
-            <input type="text" id="new-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 2">
-            <div class="grid grid-cols-2 gap-2"><input type="text" id="new-city" class="border p-3 rounded-xl text-sm" placeholder="City"><input type="text" id="new-county" class="border p-3 rounded-xl text-sm" placeholder="County"></div>
-            <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
-        </div>
-        <div class="grid grid-cols-2 gap-2"><input type="date" id="new-start" class="border p-3 rounded-xl text-sm"><input type="date" id="new-end" class="border p-3 rounded-xl text-sm"></div>
-        <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Create Job</button>
-        <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
-    </div></div>
+    <div id="add-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-3 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-black uppercase italic text-megson-blue">New Project</h2>
+            <input type="text" id="new-client" class="w-full border p-4 rounded-xl" placeholder="Client Name">
+            
+            <select id="new-type" class="w-full border p-4 rounded-xl font-bold bg-gray-50">
+                <option value="Plastering">Plastering</option>
+                <option value="Rendering">Rendering</option>
+                <option value="Coving">Coving</option>
+                <option value="Tiling">Tiling</option>
+                <option value="Screeding">Screeding</option>
+                <option value="Artexing">Artexing</option>
+                <option value="Bricklaying">Bricklaying</option>
+            </select>
 
-    <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4"><div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-3 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center"><h2 class="text-xl font-black uppercase italic text-megson-blue">Edit Job</h2><select id="edit-status" class="bg-gray-100 p-2 rounded-lg text-[10px] font-black"><option value="Pending">QUOTE</option><option value="Invoiced">INVOICED</option><option value="Completed">PAID</option></select></div>
-        <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold">
-        <div class="grid grid-cols-2 gap-2"><input type="tel" id="edit-phone" class="border p-4 rounded-xl text-sm" placeholder="Phone"><input type="email" id="edit-email" class="border p-4 rounded-xl text-sm" placeholder="Email"></div>
-        <div class="space-y-2 border-y py-3">
-            <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 1"><input type="text" id="edit-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 2">
-            <div class="grid grid-cols-2 gap-2"><input type="text" id="edit-city" class="border p-3 rounded-xl text-sm" placeholder="City"><input type="text" id="edit-county" class="border p-3 rounded-xl text-sm" placeholder="County"></div>
-            <input type="text" id="edit-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+            <div class="space-y-2">
+                <input type="text" id="new-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 1">
+                <input type="text" id="new-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Address Line 2">
+                <div class="grid grid-cols-2 gap-2"><input type="text" id="new-city" class="border p-3 rounded-xl text-sm" placeholder="City"><input type="text" id="new-county" class="border p-3 rounded-xl text-sm" placeholder="County"></div>
+                <input type="text" id="new-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="tel" id="new-phone" class="border p-3 rounded-xl text-sm" placeholder="Phone Number">
+                <input type="email" id="new-email" class="border p-3 rounded-xl text-sm" placeholder="Email Address">
+            </div>
+            <div class="grid grid-cols-2 gap-2"><input type="date" id="new-start" class="border p-3 rounded-xl text-sm"><input type="date" id="new-end" class="border p-3 rounded-xl text-sm"></div>
+            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Create Job</button>
+            <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
         </div>
-        <div class="bg-gray-50 p-3 rounded-xl"><label class="text-[9px] font-black uppercase text-gray-400">Total Project Value (£)</label><input type="number" id="edit-value" class="w-full bg-transparent font-bold text-xl"></div>
-        <div class="grid grid-cols-2 gap-2"><input type="date" id="edit-start" oninput="updateEditDur()" class="border p-3 rounded-xl text-sm"><input type="date" id="edit-end" oninput="updateEditDur()" class="border p-3 rounded-xl text-sm"></div>
-        <textarea id="edit-notes" class="w-full border p-4 rounded-xl h-20 text-sm" placeholder="Notes..."></textarea>
-        <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase">Save Changes</button>
-        <button onclick="closeModal('edit-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
-    </div></div>
+    </div>
+
+    <div id="edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl p-6 space-y-3 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-black uppercase italic text-megson-blue">Edit Job</h2>
+                <select id="edit-status" class="bg-gray-100 p-2 rounded-lg text-[10px] font-black">
+                    <option value="Not Started">NOT STARTED</option>
+                    <option value="In Progress">IN PROGRESS</option>
+                    <option value="Completed">COMPLETED</option>
+                    <option value="Past">PAST</option>
+                </select>
+            </div>
+            
+            <input type="text" id="edit-client" class="w-full border p-4 rounded-xl font-bold">
+            
+            <select id="edit-type" class="w-full border p-3 rounded-xl text-sm font-bold bg-gray-50">
+                <option value="Plastering">Plastering</option>
+                <option value="Rendering">Rendering</option>
+                <option value="Coving">Coving</option>
+                <option value="Tiling">Tiling</option>
+                <option value="Screeding">Screeding</option>
+                <option value="Artexing">Artexing</option>
+                <option value="Bricklaying">Bricklaying</option>
+            </select>
+
+            <div class="grid grid-cols-2 gap-2"><input type="tel" id="edit-phone" class="border p-3 rounded-xl text-sm" placeholder="Phone"><input type="email" id="edit-email" class="border p-3 rounded-xl text-sm" placeholder="Email"></div>
+            <div class="space-y-2 border-y py-3">
+                <input type="text" id="edit-addr1" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 1"><input type="text" id="edit-addr2" class="w-full border p-3 rounded-xl text-sm" placeholder="Line 2">
+                <div class="grid grid-cols-2 gap-2"><input type="text" id="edit-city" class="border p-3 rounded-xl text-sm" placeholder="City"><input type="text" id="edit-county" class="border p-3 rounded-xl text-sm" placeholder="County"></div>
+                <input type="text" id="edit-postcode" class="w-full border p-3 rounded-xl text-sm uppercase" placeholder="Postcode">
+            </div>
+
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <h3 class="text-[10px] font-black uppercase text-blue-800 mb-2">In-Project Pricing Calculator</h3>
+                <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div><label class="text-[8px] uppercase font-bold text-gray-500">Materials Cost (£)</label><input type="number" id="in-calc-mats" class="w-full border p-2 rounded text-sm font-bold" oninput="runInProjectCalc()"></div>
+                    <div><label class="text-[8px] uppercase font-bold text-gray-500">Est. Days</label><input type="number" id="in-calc-days" class="w-full border p-2 rounded text-sm font-bold" oninput="runInProjectCalc()"></div>
+                    <div><label class="text-[8px] uppercase font-bold text-gray-500">Day Rate (£)</label><input type="number" id="in-calc-rate" class="w-full border p-2 rounded text-sm font-bold" value="200" oninput="runInProjectCalc()"></div>
+                </div>
+                <div class="flex justify-between items-center bg-white p-2 rounded">
+                    <span class="text-[10px] font-bold">Calculated Total:</span>
+                    <span id="in-calc-total" class="font-black text-blue-600">£0.00</span>
+                </div>
+                <button onclick="applyInProjectCalc()" class="w-full mt-2 bg-blue-600 text-white text-[10px] font-black uppercase py-2 rounded">Set as Project Total</button>
+            </div>
+
+            <div class="bg-gray-100 p-3 rounded-xl"><label class="text-[9px] font-black uppercase text-gray-500">Total Project Value (£)</label><input type="number" id="edit-value" class="w-full bg-transparent font-black text-xl text-megson-blue"></div>
+            
+            <div class="grid grid-cols-2 gap-2"><input type="date" id="edit-start" class="border p-3 rounded-xl text-sm"><input type="date" id="edit-end" class="border p-3 rounded-xl text-sm"></div>
+            <textarea id="edit-notes" class="w-full border p-4 rounded-xl h-20 text-sm" placeholder="Job Notes..."></textarea>
+            
+            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg">Save Changes</button>
+            <div class="flex justify-between items-center px-2">
+                <button onclick="closeModal('edit-modal')" class="text-gray-400 font-bold">Cancel</button>
+                <button onclick="deleteJob()" class="text-red-500 font-black text-[10px] uppercase">Delete Job</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let appState = { 
@@ -153,13 +203,29 @@
         };
 
         function init() {
-            const saved = localStorage.getItem('megson_v8_works');
+            const saved = localStorage.getItem('megson_v9');
             if(saved) appState = JSON.parse(saved);
+            
+            // Map old statuses to new statuses if migrating
+            appState.jobs.forEach(job => {
+                if(job.status === 'Pending') job.status = 'Not Started';
+                if(job.status === 'Invoiced') job.status = 'Completed';
+                if(!job.type) job.type = 'Plastering';
+            });
+
+            document.getElementById('biz-name').value = appState.profile.bizName || "";
+            document.getElementById('user-real-name').value = appState.profile.realName || "";
+            document.getElementById('user-phone').value = appState.profile.phone || "";
+            document.getElementById('user-email').value = appState.profile.email || "";
+            document.getElementById('user-acc').value = appState.profile.acc || "";
+            document.getElementById('user-sort').value = appState.profile.sort || "";
+            
             updateUIBranding(); renderJobs();
         }
 
-        function save() { localStorage.setItem('megson_v8_works', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_v9', JSON.stringify(appState)); }
 
+        // Global Estimator (Plastering)
         function runAdvancedCalc() {
             const L = parseFloat(document.getElementById('calc-L').value) || 0;
             const W = parseFloat(document.getElementById('calc-W').value) || 0;
@@ -169,9 +235,7 @@
             const pBoard = parseFloat(document.getElementById('price-board').value) || 0;
             const pBag = parseFloat(document.getElementById('price-bag').value) || 0;
 
-            // Area = Walls (2LH + 2WH) + Ceiling (LW)
             const area = ((2 * L * H) + (2 * W * H) + (L * W)) * waste;
-            
             const boards = Math.ceil(area / 2.88);
             const bags = Math.ceil(area / 10);
             
@@ -179,7 +243,6 @@
             const costBags = bags * pBag;
             const totalMats = costBoards + costBags;
             
-            // Auto-calculate days based on area (roughly 25m2 per day for 1 man)
             const estDays = Math.ceil(area / 25) || 1;
             const labor = estDays * dayRate;
             
@@ -191,27 +254,75 @@
             document.getElementById('res-final-total').innerText = `£${(totalMats + labor).toFixed(2)}`;
         }
 
-        function applyCalcToActiveJob() {
-            if(!appState.currentEditId) return alert("Open a job first to apply this price!");
-            const finalVal = document.getElementById('res-final-total').innerText.replace('£','');
-            document.getElementById('edit-value').value = finalVal;
-            showSection('jobs');
-            alert("Price updated in Edit Screen. Click 'Save Changes' to confirm.");
+        // In-Project Estimator
+        function runInProjectCalc() {
+            const mats = parseFloat(document.getElementById('in-calc-mats').value) || 0;
+            const days = parseFloat(document.getElementById('in-calc-days').value) || 0;
+            const rate = parseFloat(document.getElementById('in-calc-rate').value) || 0;
+            const total = mats + (days * rate);
+            document.getElementById('in-calc-total').innerText = `£${total.toFixed(2)}`;
+        }
+
+        function applyInProjectCalc() {
+            const totalText = document.getElementById('in-calc-total').innerText.replace('£', '');
+            document.getElementById('edit-value').value = totalText;
+        }
+
+        function renderJobs() {
+            const container = document.getElementById('job-list-container');
+            const filtered = appState.jobs.filter(j => appState.filter === 'All' || j.status === appState.filter);
+            
+            const statusStyle = {
+                "Not Started": "border-gray-300",
+                "In Progress": "border-blue-500",
+                "Completed": "border-green-500",
+                "Past": "border-red-500"
+            };
+
+            container.innerHTML = filtered.map(job => `
+                <div class="bg-white p-5 rounded-3xl shadow-sm border-l-[12px] ${statusStyle[job.status] || 'border-gray-300'}">
+                    <div class="flex justify-between items-start mb-4" onclick="openEdit(${job.id})">
+                        <div>
+                            <h3 class="font-black text-gray-800 uppercase text-lg leading-tight">${job.client} ✏️</h3>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1 || ''}, ${job.postcode || ''}</p>
+                            <div class="flex gap-2 mt-2">
+                                <span class="text-[9px] font-black text-megson-blue bg-blue-50 px-2 py-0.5 rounded uppercase">${job.type}</span>
+                                <span class="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded uppercase">£${job.value}</span>
+                            </div>
+                        </div>
+                        <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase text-center min-w-[70px]">${job.status}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 gap-2 border-t pt-3 mt-2">
+                        <button onclick="window.location.href='tel:${job.phone}'" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📞 Call</button>
+                        <button onclick="copyToClipboard('${job.phone}')" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📋 Copy No</button>
+                        <button onclick="addToCalendar(${job.id})" class="bg-orange-100 text-orange-600 p-2 rounded-xl text-[9px] font-black uppercase text-center">📅 Cal</button>
+                        <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-2 rounded-xl text-[9px] font-black uppercase text-center">📄 PDF</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function copyToClipboard(text) {
+            if(!text || text === 'undefined') return alert("No phone number saved for this client.");
+            navigator.clipboard.writeText(text); alert("Number copied to clipboard!");
+        }
+
+        function addToCalendar(id) {
+            const j = appState.jobs.find(x => x.id === id);
+            if(!j.dateFrom) return alert("Please set a start date in the job edit screen first.");
+            const start = j.dateFrom.replace(/-/g,'');
+            const end = j.dateTo ? j.dateTo.replace(/-/g,'') : start;
+            const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(j.type + ': ' + j.client)}&location=${encodeURIComponent(j.addr1+' '+j.postcode)}&dates=${start}/${end}`;
+            window.open(url, '_blank');
         }
 
         async function downloadPDF(jobId) {
             const job = appState.jobs.find(j => j.id === jobId);
             const doc = new jspdf.jsPDF();
-            const isInvoice = job.status !== "Pending";
+            const isInvoice = (job.status === "Completed" || job.status === "Past");
             
-            // Header
             doc.setFillColor(0, 51, 102).rect(0, 0, 210, 40, 'F');
-            
-            // Logo in PDF (Using the provided direct link as it's most reliable for JS)
-            try {
-                const logoUrl = "https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png";
-                doc.addImage(logoUrl, 'PNG', 150, 5, 45, 30);
-            } catch(e) { console.log("Logo load failed for PDF"); }
+            try { doc.addImage("https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png", 'PNG', 150, 5, 45, 30); } catch(e) {}
 
             doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 20, 22);
             doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 20, 30);
@@ -224,9 +335,12 @@
             doc.setFont(undefined, 'normal').text(`${job.addr1}${job.addr2 ? ', '+job.addr2 : ''}`, 55, y); y+=6;
             doc.text(`${job.city}, ${job.county}, ${job.postcode.toUpperCase()}`, 55, y); y+=15;
             
+            doc.setFont(undefined, 'bold').text(`JOB TYPE:`, 20, y);
+            doc.setFont(undefined, 'normal').text(job.type, 55, y); y+=12;
+
             doc.setFont(undefined, 'bold').text(`DESCRIPTION OF WORKS:`, 20, y); y+=7;
             doc.setFont(undefined, 'normal').setFontSize(10);
-            const splitNotes = doc.splitTextToSize(job.notes || "Plastering works as discussed.", 170);
+            const splitNotes = doc.splitTextToSize(job.notes || `${job.type} works as discussed.`, 170);
             doc.text(splitNotes, 20, y);
             y += (splitNotes.length * 5) + 10;
             
@@ -241,43 +355,16 @@
             doc.save(`${isInvoice ? 'Invoice' : 'Quote'}_${job.client}.pdf`);
         }
 
-        // --- RESTORED CORE FUNCTIONS ---
-        function renderJobs() {
-            const container = document.getElementById('job-list-container');
-            const filtered = appState.jobs.filter(j => appState.filter === 'All' || j.status === appState.filter);
-            container.innerHTML = filtered.map(job => `
-                <div class="bg-white p-5 rounded-3xl shadow-sm border-l-[12px] ${job.status==='Pending'?'border-gray-300':job.status==='Invoiced'?'border-orange-500':'border-green-500'}">
-                    <div class="flex justify-between items-start mb-4" onclick="openEdit(${job.id})">
-                        <div>
-                            <h3 class="font-black text-gray-800 uppercase text-lg">${job.client} ✏️</h3>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase">${job.addr1}, ${job.postcode}</p>
-                            <span class="text-[11px] font-black text-orange-600">PROJECT TOTAL: £${job.value}</span>
-                        </div>
-                        <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase">${job.status}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="openMap('${job.addr1} ${job.postcode}')" class="bg-blue-600 text-white p-3 rounded-xl text-[9px] font-black uppercase">📍 Map</button>
-                        <button onclick="addToCalendar(${job.id})" class="bg-orange-500 text-white p-3 rounded-xl text-[9px] font-black uppercase">📅 Cal</button>
-                        <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-3 rounded-xl text-[9px] font-black uppercase">📄 PDF</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        function openMap(addr) { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`, '_blank'); }
-        
-        function addToCalendar(id) {
-            const j = appState.jobs.find(x => x.id === id);
-            const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Plastering: '+j.client)}&location=${encodeURIComponent(j.addr1+' '+j.postcode)}&dates=${j.dateFrom.replace(/-/g,'')}/${j.dateTo.replace(/-/g,'')}`;
-            window.open(url, '_blank');
-        }
-
         function createNewJob() {
             const name = document.getElementById('new-client').value;
-            if(!name) return;
+            if(!name) return alert("Enter a client name");
             appState.jobs.push({
-                id: Date.now(), client: name, addr1: document.getElementById('new-addr1').value, addr2: document.getElementById('new-addr2').value,
+                id: Date.now(), client: name, type: document.getElementById('new-type').value,
+                addr1: document.getElementById('new-addr1').value, addr2: document.getElementById('new-addr2').value,
                 city: document.getElementById('new-city').value, county: document.getElementById('new-county').value, postcode: document.getElementById('new-postcode').value,
-                dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value, status: 'Pending', value: 0, notes: ''
+                phone: document.getElementById('new-phone').value, email: document.getElementById('new-email').value,
+                dateFrom: document.getElementById('new-start').value, dateTo: document.getElementById('new-end').value, 
+                status: 'Not Started', value: 0, notes: ''
             });
             save(); renderJobs(); closeModal('add-modal');
         }
@@ -285,22 +372,53 @@
         function openEdit(id) {
             const j = appState.jobs.find(x => x.id === id);
             appState.currentEditId = id;
-            document.getElementById('edit-client').value = j.client;
-            document.getElementById('edit-addr1').value = j.addr1;
-            document.getElementById('edit-postcode').value = j.postcode;
-            document.getElementById('edit-value').value = j.value;
-            document.getElementById('edit-status').value = j.status;
-            document.getElementById('edit-notes').value = j.notes;
+            document.getElementById('edit-client').value = j.client || '';
+            document.getElementById('edit-type').value = j.type || 'Plastering';
+            document.getElementById('edit-phone').value = j.phone || '';
+            document.getElementById('edit-email').value = j.email || '';
+            document.getElementById('edit-addr1').value = j.addr1 || '';
+            document.getElementById('edit-addr2').value = j.addr2 || '';
+            document.getElementById('edit-city').value = j.city || '';
+            document.getElementById('edit-county').value = j.county || '';
+            document.getElementById('edit-postcode').value = j.postcode || '';
+            document.getElementById('edit-start').value = j.dateFrom || '';
+            document.getElementById('edit-end').value = j.dateTo || '';
+            document.getElementById('edit-value').value = j.value || 0;
+            document.getElementById('edit-status').value = j.status || 'Not Started';
+            document.getElementById('edit-notes').value = j.notes || '';
+            
+            // Reset the in-project calc when opening
+            document.getElementById('in-calc-mats').value = '';
+            document.getElementById('in-calc-days').value = '';
+            document.getElementById('in-calc-total').innerText = '£0.00';
+            
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
         function saveEdit() {
             const j = appState.jobs.find(x => x.id === appState.currentEditId);
             j.client = document.getElementById('edit-client').value;
+            j.type = document.getElementById('edit-type').value;
+            j.phone = document.getElementById('edit-phone').value;
+            j.email = document.getElementById('edit-email').value;
+            j.addr1 = document.getElementById('edit-addr1').value;
+            j.addr2 = document.getElementById('edit-addr2').value;
+            j.city = document.getElementById('edit-city').value;
+            j.county = document.getElementById('edit-county').value;
+            j.postcode = document.getElementById('edit-postcode').value;
+            j.dateFrom = document.getElementById('edit-start').value;
+            j.dateTo = document.getElementById('edit-end').value;
             j.value = document.getElementById('edit-value').value;
             j.status = document.getElementById('edit-status').value;
             j.notes = document.getElementById('edit-notes').value;
             save(); renderJobs(); closeModal('edit-modal');
+        }
+        
+        function deleteJob() {
+            if(confirm("Permanently delete this job?")) {
+                appState.jobs = appState.jobs.filter(j => j.id !== appState.currentEditId);
+                save(); renderJobs(); closeModal('edit-modal');
+            }
         }
 
         function showSection(id) {
@@ -312,15 +430,23 @@
 
         function updateProfile() {
             appState.profile.bizName = document.getElementById('biz-name').value;
+            appState.profile.realName = document.getElementById('user-real-name').value;
+            appState.profile.phone = document.getElementById('user-phone').value;
+            appState.profile.email = document.getElementById('user-email').value;
             appState.profile.acc = document.getElementById('user-acc').value;
             appState.profile.sort = document.getElementById('user-sort').value;
-            save();
+            updateUIBranding(); save();
+        }
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
+            const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `megson_backup.json`); dl.click();
         }
 
         function updateUIBranding() { document.getElementById('header-phone').innerText = appState.profile.phone; }
         function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-        function setFilter(s) { appState.filter = s; renderJobs(); }
+        function setFilter(s) { appState.filter = s; renderJobs(); document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active', 'text-white')); document.querySelector(`[data-status="${s}"]`).classList.add('active', 'text-white'); }
+        
         window.onload = init;
     </script>
 </body>
