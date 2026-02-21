@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering Hub</title>
+    <title>Megson Pro</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
@@ -293,13 +293,22 @@
                         <span class="text-[9px] px-2 py-1 bg-gray-100 rounded-full font-black uppercase text-center min-w-[70px]">${job.status}</span>
                     </div>
                     
-                    <div class="grid grid-cols-4 gap-2 border-t pt-3 mt-2">
-                        <button onclick="window.location.href='tel:${job.phone}'" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📞 Call</button>
-                        <button onclick="copyToClipboard('${job.phone}')" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📋 Copy No</button>
+                    <div class="grid grid-cols-3 gap-2 border-t pt-3 mt-2 mb-2">
+                        <button onclick="openMap('${job.addr1} ${job.postcode}')" class="bg-blue-100 text-blue-700 p-2 rounded-xl text-[9px] font-black uppercase text-center">📍 Map</button>
                         <button onclick="addToCalendar(${job.id})" class="bg-orange-100 text-orange-600 p-2 rounded-xl text-[9px] font-black uppercase text-center">📅 Cal</button>
                         <button onclick="downloadPDF(${job.id})" class="bg-megson-blue text-white p-2 rounded-xl text-[9px] font-black uppercase text-center">📄 PDF</button>
                     </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="window.location.href='tel:${job.phone}'" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📞 Call</button>
+                        <button onclick="copyToClipboard('${job.phone}')" class="bg-slate-100 p-2 rounded-xl text-[9px] font-black uppercase text-center">📋 Copy No</button>
+                    </div>
                 </div>`).join('');
+        }
+
+        // Action Buttons Logic
+        function openMap(addr) { 
+            if(!addr || addr.trim() === 'undefined') return alert("No address saved!");
+            window.open(`https://maps.google.com/?q=${encodeURIComponent(addr)}`, '_blank'); 
         }
 
         function copyToClipboard(text) {
