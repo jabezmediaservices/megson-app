@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering</title>
+    <title>Megson Plastering Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -14,17 +14,30 @@
         #edit-modal, #add-modal { background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
         .tab-btn.active { color: var(--megson-orange); border-top: 4px solid var(--megson-orange); }
         .logo-font { font-family: 'Arial Black', sans-serif; font-style: italic; letter-spacing: -1px; }
-        .logo-img { height: 60px; width: auto; object-fit: contain; }
+        
+        /* Logo Styling for proper fit */
+        .logo-img { 
+            height: 70px; 
+            width: auto; 
+            object-fit: contain;
+            background: white;
+            border-radius: 8px;
+            padding: 2px;
+        }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans pb-32">
 
     <div id="app-content">
-        <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-24">
+        <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-28">
             <div class="flex items-center gap-3">
                 <div id="header-logo-container">
-                    <img src="https://instasize.com/p/0158cd34743f689d7e1ab7ee3de76bc9e40d5fc5de9fb32d51decc2f8b0a8846" class="logo-img" alt="Logo">
+                    <img src="logo.png" 
+                         class="logo-img" 
+                         alt="Logo" 
+                         onerror="this.src='https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png'">
                 </div>
                 <div class="flex flex-col">
                     <span class="logo-font text-2xl uppercase leading-none">Megson Plastering</span>
@@ -35,7 +48,7 @@
         </header>
 
         <section id="sec-jobs" class="p-4 space-y-4">
-            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg mb-2">
+            <button onclick="openAddModal()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg flex justify-center items-center gap-2 mb-2">
                 ➕ Add New Job
             </button>
 
@@ -57,11 +70,11 @@
                     <div class="text-center"><label class="text-[9px] text-gray-400 font-bold block mb-1">H (m)</label><input type="number" id="pro-H" class="w-full border p-4 rounded-2xl text-center font-bold" oninput="runProCalc()"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-blue-50 p-6 rounded-3xl text-center">
+                    <div class="bg-blue-50 p-6 rounded-3xl text-center border-b-4 border-blue-200">
                         <span class="text-[10px] uppercase font-black text-blue-400">Boards</span>
                         <div id="res-boards" class="text-4xl font-black text-megson-blue">0</div>
                     </div>
-                    <div class="bg-orange-50 p-6 rounded-3xl text-center">
+                    <div class="bg-orange-50 p-6 rounded-3xl text-center border-b-4 border-orange-200">
                         <span class="text-[10px] uppercase font-black text-orange-400">Multi Bags</span>
                         <div id="res-multi" class="text-4xl font-black text-orange-600">0</div>
                     </div>
@@ -79,8 +92,8 @@
                         <input type="text" id="user-acc" oninput="updateProfile()" placeholder="Account No" class="border p-4 rounded-2xl">
                         <input type="text" id="user-sort" oninput="updateProfile()" placeholder="Sort Code" class="border p-4 rounded-2xl">
                     </div>
-                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Business Phone" class="w-full border p-4 rounded-2xl">
-                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Business Email" class="w-full border p-4 rounded-2xl">
+                    <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone Number" class="w-full border p-4 rounded-2xl">
+                    <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email Address" class="w-full border p-4 rounded-2xl">
                 </div>
                 <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup Data</button>
             </div>
@@ -113,7 +126,7 @@
                 <input type="date" id="new-start" class="border p-3 rounded-xl text-sm">
                 <input type="date" id="new-end" class="border p-3 rounded-xl text-sm">
             </div>
-            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase">Create Job</button>
+            <button onclick="createNewJob()" class="w-full bg-megson-blue text-white p-4 rounded-2xl font-black uppercase shadow-lg">Create Job</button>
             <button onclick="closeModal('add-modal')" class="w-full text-gray-400 font-bold">Cancel</button>
         </div>
     </div>
@@ -164,7 +177,7 @@
 
             <textarea id="edit-notes" class="w-full border p-4 rounded-xl h-20 text-sm" placeholder="Notes..."></textarea>
             
-            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase">Save Changes</button>
+            <button onclick="saveEdit()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg">Save Changes</button>
             <div class="flex justify-between items-center px-2">
                 <button onclick="closeModal('edit-modal')" class="text-gray-400 font-bold">Cancel</button>
                 <button onclick="deleteJob()" class="text-red-500 font-black text-[10px] uppercase">Delete Job</button>
@@ -180,7 +193,7 @@
         };
 
         function init() {
-            const saved = localStorage.getItem('megson_v5_no_api');
+            const saved = localStorage.getItem('megson_v6_final');
             if(saved) appState = JSON.parse(saved);
             
             document.getElementById('biz-name').value = appState.profile.bizName || "";
@@ -194,7 +207,7 @@
             renderJobs();
         }
 
-        function save() { localStorage.setItem('megson_v5_no_api', JSON.stringify(appState)); }
+        function save() { localStorage.setItem('megson_v6_final', JSON.stringify(appState)); }
 
         function calculateDuration(start, end) {
             if(!start || !end) return "TBC";
@@ -297,38 +310,46 @@
             const doc = new jspdf.jsPDF();
             const isInvoice = job.status !== "Pending";
             
+            // Header Bar
             doc.setFillColor(0, 51, 102).rect(0, 0, 210, 40, 'F');
-            doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 50, 22);
-            doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 50, 30);
+            doc.setFontSize(22).setTextColor(255).text(appState.profile.bizName.toUpperCase(), 20, 22);
+            doc.setFontSize(10).text(`${appState.profile.phone} | ${appState.profile.email}`, 20, 30);
             
+            // Main Info
             doc.setTextColor(0).setFontSize(18).text(isInvoice ? 'INVOICE' : 'QUOTATION', 20, 60);
             doc.setFontSize(10).text(`To: ${job.client}`, 20, 75);
             
-            let y = 80;
-            doc.text(`Site Address:`, 20, y);
-            doc.text(`${job.addr1}`, 45, y); y += 5;
-            if(job.addr2) { doc.text(`${job.addr2}`, 45, y); y += 5; }
-            doc.text(`${job.city}, ${job.county}`, 45, y); y += 5;
-            doc.text(`${job.postcode}`, 45, y); y += 10;
+            // Full Address Section
+            let y = 85;
+            doc.setFont(undefined, 'bold').text(`Site Address:`, 20, y);
+            doc.setFont(undefined, 'normal');
+            doc.text(`${job.addr1}`, 50, y); y += 5;
+            if(job.addr2) { doc.text(`${job.addr2}`, 50, y); y += 5; }
+            doc.text(`${job.city}`, 50, y); y += 5;
+            if(job.county) { doc.text(`${job.county}`, 50, y); y += 5; }
+            doc.text(`${job.postcode.toUpperCase()}`, 50, y); y += 15;
             
-            doc.text(`Dates: ${job.dateFrom} to ${job.dateTo}`, 20, y);
-            doc.setFontSize(12).setFont(undefined, 'bold').text(`Total Amount: £${job.value.toFixed(2)}`, 20, y + 15);
+            doc.text(`Project Dates: ${job.dateFrom} to ${job.dateTo}`, 20, y);
+            y += 15;
+            doc.setFontSize(12).setFont(undefined, 'bold').text(`TOTAL AMOUNT: £${job.value.toFixed(2)}`, 20, y);
             
+            // Bank Details
             if(isInvoice && appState.profile.acc) {
-                doc.setDrawColor(200).line(20, 130, 190, 130);
-                doc.setFontSize(10).text('PAYMENT DETAILS', 20, 140);
+                doc.setDrawColor(200).line(20, 150, 190, 150);
+                doc.setFontSize(10).text('PAYMENT DETAILS', 20, 160);
                 doc.setFontSize(9).setFont(undefined, 'normal');
-                doc.text(`Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 148);
-                doc.text(`Account: ${appState.profile.acc}`, 20, 154);
-                doc.text(`Sort Code: ${appState.profile.sort}`, 20, 160);
+                doc.text(`Payee Name: ${appState.profile.realName || appState.profile.bizName}`, 20, 170);
+                doc.text(`Account No: ${appState.profile.acc}`, 20, 176);
+                doc.text(`Sort Code: ${appState.profile.sort}`, 20, 182);
             }
+            
             doc.save(`${isInvoice ? 'Invoice' : 'Quote'}_${job.client}.pdf`);
         }
 
         function emailQuote(id) {
             const job = appState.jobs.find(j => j.id === id);
             const type = job.status === "Pending" ? "Quote" : "Invoice";
-            const body = encodeURIComponent(`Hi ${job.client},\n\nAttached is your ${type} for ${job.addr1}.\nTotal: £${job.value}\n\nThanks,\n${appState.profile.bizName}`);
+            const body = encodeURIComponent(`Hi ${job.client},\n\nPlease find the ${type} for the works at ${job.addr1}.\nTotal: £${job.value}\n\nKind Regards,\n${appState.profile.bizName}`);
             window.location.href = `mailto:${job.email}?subject=${type} for ${job.addr1}&body=${body}`;
         }
 
@@ -353,6 +374,8 @@
         function showSection(id) {
             ['jobs', 'settings', 'pro-calc'].forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
             document.getElementById('sec-' + id).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
         function setFilter(status) {
             appState.filter = status;
@@ -361,7 +384,7 @@
             renderJobs();
         }
         function deleteJob() {
-            if(confirm("Delete?")) {
+            if(confirm("Permanently delete this job?")) {
                 appState.jobs = appState.jobs.filter(j => j.id !== appState.currentEditId);
                 save(); renderJobs(); closeModal('edit-modal');
             }
