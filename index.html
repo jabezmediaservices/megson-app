@@ -316,13 +316,43 @@
             navigator.clipboard.writeText(text); alert("Number copied to clipboard!");
         }
 
+        // GENERATE AND DOWNLOAD .ICS FILE
         function addToCalendar(id) {
             const j = appState.jobs.find(x => x.id === id);
             if(!j.dateFrom) return alert("Please set a start date in the job edit screen first.");
-            const start = j.dateFrom.replace(/-/g,'');
-            const end = j.dateTo ? j.dateTo.replace(/-/g,'') : start;
-            const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(j.type + ': ' + j.client)}&location=${encodeURIComponent(j.addr1+' '+j.postcode)}&dates=${start}/${end}`;
-            window.open(url, '_blank');
+            
+            const startStr = j.dateFrom.replace(/-/g,'');
+            let endStr = startStr;
+            
+            // ICS all-day events require the end date to be the day AFTER the event finishes
+            let endDate = new Date(j.dateTo || j.dateFrom);
+            endDate.setDate(endDate.getDate() + 1);
+            let yyyy = endDate.getFullYear();
+            let mm = String(endDate.getMonth() + 1).padStart(2, '0');
+            let dd = String(endDate.getDate()).padStart(2, '0');
+            endStr = `${yyyy}${mm}${dd}`;
+
+            const icsData = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Megson Pro//App//EN",
+                "BEGIN:VEVENT",
+                `DTSTART;VALUE=DATE:${startStr}`,
+                `DTEND;VALUE=DATE:${endStr}`,
+                `SUMMARY:${j.type}: ${j.client}`,
+                `LOCATION:${j.addr1 || ''} ${j.postcode || ''}`,
+                `DESCRIPTION:${j.notes || 'Job details inside Megson Pro'}`,
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join('\r\n');
+
+            const blob = new Blob([icsData], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Job_${j.client.replace(/\s+/g, '_')}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         async function downloadPDF(jobId) {
