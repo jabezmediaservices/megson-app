@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Megson Plastering Hub</title>
+    <title>Megson Pro</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
     
@@ -28,7 +28,7 @@
             <div class="flex items-center gap-3">
                 <img src="logo.png" class="logo-img" alt="Logo" onerror="this.src='https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png'">
                 <div class="flex flex-col">
-                    <span class="logo-font text-2xl uppercase leading-none">Megson Plastering Hub</span>
+                    <span class="logo-font text-2xl uppercase leading-none">Megson Pro</span>
                     <span id="header-phone" class="text-sm font-bold text-orange-400 mt-1">07955 315849</span>
                 </div>
             </div>
@@ -94,7 +94,12 @@
                 </div>
                 <input type="tel" id="user-phone" oninput="updateProfile()" placeholder="Phone" class="w-full border p-4 rounded-2xl">
                 <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email" class="w-full border p-4 rounded-2xl">
-                <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs">💾 Backup All Data</button>
+                
+                <div class="pt-4 space-y-2 border-t mt-4">
+                    <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs shadow-md">💾 Backup All Data</button>
+                    <button onclick="document.getElementById('import-file').click()" class="w-full bg-gray-100 text-gray-700 border-2 border-dashed border-gray-300 p-4 rounded-xl font-black uppercase text-xs">📂 Restore Data</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+                </div>
             </div>
         </section>
 
@@ -476,9 +481,34 @@
             appState.profile.sort = document.getElementById('user-sort').value;
             updateUIBranding(); save();
         }
+
+        // DATA MANAGEMENT
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `megson_backup.json`); dl.click();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if(importedState && importedState.jobs) {
+                        appState = importedState;
+                        save(); // save to local storage
+                        init(); // re-initialize to map UI fields and jobs
+                        alert("Data successfully restored!");
+                    } else {
+                        alert("Invalid backup file format.");
+                    }
+                } catch (error) {
+                    alert("Error reading backup file.");
+                }
+                event.target.value = ''; // Reset input so you can select the same file again if needed
+            };
+            reader.readAsText(file);
         }
 
         function updateUIBranding() { document.getElementById('header-phone').innerText = appState.profile.phone; }
