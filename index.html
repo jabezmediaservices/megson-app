@@ -9,6 +9,11 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root { --megson-blue: #003366; --megson-orange: #f39c12; }
         .bg-megson-blue { background-color: var(--megson-blue); }
@@ -23,7 +28,50 @@
 </head>
 <body class="bg-gray-100 font-sans pb-32">
 
-    <div id="app-content">
+    <div id="auth-overlay" class="fixed inset-0 bg-gray-100 z-50 flex items-center justify-center p-4">
+        
+        <div id="screen-email" class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-xl space-y-6 hidden">
+            <div class="text-center">
+                <h1 class="logo-font text-2xl text-megson-blue uppercase">Megson Hub</h1>
+                <p class="text-xs font-bold text-gray-400 uppercase mt-1">Cloud Login</p>
+            </div>
+            <div class="space-y-3">
+                <input type="email" id="auth-email" class="w-full border-2 border-gray-200 p-4 rounded-xl text-sm font-bold bg-gray-50 focus:border-megson-blue outline-none" placeholder="Email Address">
+                <input type="password" id="auth-pass" class="w-full border-2 border-gray-200 p-4 rounded-xl text-sm font-bold bg-gray-50 focus:border-megson-blue outline-none" placeholder="Password">
+            </div>
+            <div class="space-y-2">
+                <button onclick="handleLogin()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-lg hover:bg-blue-900 transition">Log In</button>
+                <button onclick="handleRegister()" class="w-full bg-white text-megson-blue border-2 border-megson-blue p-4 rounded-xl font-black uppercase hover:bg-blue-50 transition">Register New Account</button>
+            </div>
+            <p id="auth-error" class="text-red-500 text-xs font-bold text-center h-4"></p>
+        </div>
+
+        <div id="screen-setup-pin" class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-xl space-y-6 hidden">
+            <div class="text-center">
+                <h2 class="text-xl font-black text-megson-blue uppercase italic">Secure Your App</h2>
+                <p class="text-xs text-gray-500 font-bold mt-2">Create a 4 to 6 digit PIN to quickly unlock the app on this device next time.</p>
+            </div>
+            <input type="number" id="setup-pin-input" class="w-full border-2 border-megson-blue p-4 rounded-xl text-center text-2xl tracking-[1em] font-black focus:outline-none" placeholder="••••">
+            <button onclick="savePin()" class="w-full bg-megson-orange text-white p-4 rounded-xl font-black uppercase shadow-md">Set PIN & Enter</button>
+        </div>
+
+        <div id="screen-enter-pin" class="bg-white w-full max-w-sm rounded-3xl p-8 shadow-xl space-y-6 hidden">
+            <div class="text-center">
+                <h2 class="text-xl font-black text-megson-blue uppercase italic">Welcome Back</h2>
+                <p class="text-xs text-gray-500 font-bold mt-2">Enter your PIN to unlock.</p>
+            </div>
+            <input type="password" id="enter-pin-input" class="w-full border-2 border-megson-blue p-4 rounded-xl text-center text-2xl tracking-[1em] font-black focus:outline-none" placeholder="••••">
+            <button onclick="verifyPin()" class="w-full bg-megson-blue text-white p-4 rounded-xl font-black uppercase shadow-md">Unlock App</button>
+            <button onclick="handleLogout()" class="w-full text-xs text-gray-400 font-bold uppercase mt-2">Sign Out / Switch Account</button>
+        </div>
+        
+        <div id="screen-loading" class="text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-megson-blue mx-auto mb-4"></div>
+            <p class="text-sm font-black text-megson-blue uppercase tracking-widest">Connecting...</p>
+        </div>
+    </div>
+
+    <div id="app-content" class="hidden">
         <header class="bg-megson-blue text-white p-4 shadow-lg sticky top-0 z-40 flex justify-between items-center h-28">
             <div class="flex items-center gap-3">
                 <img src="logo.png" class="logo-img" alt="Logo" onerror="this.src='https://raw.githubusercontent.com/jabezmediaservices/megson-plastering/main/logo.png'">
@@ -96,9 +144,8 @@
                 <input type="email" id="user-email" oninput="updateProfile()" placeholder="Email" class="w-full border p-4 rounded-2xl">
                 
                 <div class="pt-4 space-y-2 border-t mt-4">
-                    <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs shadow-md">💾 Backup All Data</button>
-                    <button onclick="document.getElementById('import-file').click()" class="w-full bg-gray-100 text-gray-700 border-2 border-dashed border-gray-300 p-4 rounded-xl font-black uppercase text-xs">📂 Restore Data</button>
-                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+                    <button onclick="exportData()" class="w-full bg-blue-600 text-white p-4 rounded-xl font-black uppercase text-xs shadow-md">💾 Local Backup Data</button>
+                    <button onclick="handleLogout()" class="w-full bg-red-100 text-red-600 p-4 rounded-xl font-black uppercase text-xs shadow-md">🚪 Sign Out</button>
                 </div>
             </div>
         </section>
@@ -200,35 +247,163 @@
     </div>
 
     <script>
+        // --- 1. FIREBASE CONFIGURATION (IMPORTANT: REPLACE THIS!) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNRimloc3rSUh7sVVe1oNKD-Zkq-hMatA",
+            authDomain: "megson-plastering-84ac6.firebaseapp.com",
+            projectId: "megson-plastering-84ac6",
+            storageBucket: "megson-plastering-84ac6.firebasestorage.app",
+            messagingSenderId: "413926140133",
+            appId: "1:413926140133:web:89c080c9b1c51c51778c0c"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- 2. GLOBAL APP STATE ---
         let appState = { 
             jobs: [], 
             filter: 'All', 
             currentEditId: null,
             profile: { bizName: "Megson Plastering", realName: "", phone: "07955 315849", email: "paul.megson@hotmail.com", acc: "", sort: "" }
         };
+        let currentUserId = null;
 
-        function init() {
-            const saved = localStorage.getItem('megson_v9');
-            if(saved) appState = JSON.parse(saved);
-            
-            // Map old statuses to new statuses if migrating
-            appState.jobs.forEach(job => {
-                if(job.status === 'Pending') job.status = 'Not Started';
-                if(job.status === 'Invoiced') job.status = 'Completed';
-                if(!job.type) job.type = 'Plastering';
-            });
-
-            document.getElementById('biz-name').value = appState.profile.bizName || "";
-            document.getElementById('user-real-name').value = appState.profile.realName || "";
-            document.getElementById('user-phone').value = appState.profile.phone || "";
-            document.getElementById('user-email').value = appState.profile.email || "";
-            document.getElementById('user-acc').value = appState.profile.acc || "";
-            document.getElementById('user-sort').value = appState.profile.sort || "";
-            
-            updateUIBranding(); renderJobs();
+        // --- 3. AUTHENTICATION & UI FLOW ---
+        
+        function showAuthScreen(screenId) {
+            document.getElementById('screen-loading').classList.add('hidden');
+            document.getElementById('screen-email').classList.add('hidden');
+            document.getElementById('screen-setup-pin').classList.add('hidden');
+            document.getElementById('screen-enter-pin').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
         }
 
-        function save() { localStorage.setItem('megson_v9', JSON.stringify(appState)); }
+        // Listens for authentication changes automatically
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUserId = user.uid;
+                const savedPin = localStorage.getItem('megson_device_pin');
+                if (savedPin) {
+                    showAuthScreen('screen-enter-pin');
+                } else {
+                    showAuthScreen('screen-setup-pin');
+                }
+            } else {
+                currentUserId = null;
+                showAuthScreen('screen-email');
+            }
+        });
+
+        function handleLogin() {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            document.getElementById('auth-error').innerText = "";
+            showAuthScreen('screen-loading');
+            auth.signInWithEmailAndPassword(e, p).catch(err => {
+                showAuthScreen('screen-email');
+                document.getElementById('auth-error').innerText = err.message;
+            });
+        }
+
+        function handleRegister() {
+            const e = document.getElementById('auth-email').value;
+            const p = document.getElementById('auth-pass').value;
+            document.getElementById('auth-error').innerText = "";
+            showAuthScreen('screen-loading');
+            auth.createUserWithEmailAndPassword(e, p).catch(err => {
+                showAuthScreen('screen-email');
+                document.getElementById('auth-error').innerText = err.message;
+            });
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('megson_device_pin'); // Clear PIN on logout
+            auth.signOut();
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('auth-overlay').classList.remove('hidden');
+        }
+
+        // --- 4. DEVICE PIN LOGIC ---
+        function savePin() {
+            const pin = document.getElementById('setup-pin-input').value;
+            if (pin.length < 4 || pin.length > 6) {
+                alert("PIN must be 4 to 6 digits long.");
+                return;
+            }
+            localStorage.setItem('megson_device_pin', pin);
+            fetchCloudData(); // Load the main app
+        }
+
+        function verifyPin() {
+            const entered = document.getElementById('enter-pin-input').value;
+            const saved = localStorage.getItem('megson_device_pin');
+            if (entered === saved) {
+                document.getElementById('enter-pin-input').value = ""; // clear input
+                fetchCloudData(); // Load the main app
+            } else {
+                alert("Incorrect PIN. Try again.");
+                document.getElementById('enter-pin-input').value = "";
+            }
+        }
+
+        // Allow 'Enter' key to verify PIN
+        document.getElementById('enter-pin-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') verifyPin();
+        });
+
+        // --- 5. CLOUD DATABASE SYNCING ---
+
+        function fetchCloudData() {
+            showAuthScreen('screen-loading');
+            db.collection('users').doc(currentUserId).get().then((doc) => {
+                if (doc.exists) {
+                    appState = doc.data();
+                } else {
+                    // First time user, save default state
+                    save(); 
+                }
+                
+                // Map old logic
+                if(!appState.profile) appState.profile = { bizName: "Megson Plastering", realName: "", phone: "", email: "", acc: "", sort: "" };
+                appState.jobs.forEach(job => {
+                    if(job.status === 'Pending') job.status = 'Not Started';
+                    if(job.status === 'Invoiced') job.status = 'Completed';
+                    if(!job.type) job.type = 'Plastering';
+                });
+
+                // Map to UI
+                document.getElementById('biz-name').value = appState.profile.bizName || "";
+                document.getElementById('user-real-name').value = appState.profile.realName || "";
+                document.getElementById('user-phone').value = appState.profile.phone || "";
+                document.getElementById('user-email').value = appState.profile.email || "";
+                document.getElementById('user-acc').value = appState.profile.acc || "";
+                document.getElementById('user-sort').value = appState.profile.sort || "";
+                
+                updateUIBranding(); 
+                renderJobs();
+
+                // Hide auth, show app
+                document.getElementById('auth-overlay').classList.add('hidden');
+                document.getElementById('app-content').classList.remove('hidden');
+            }).catch((error) => {
+                alert("Error fetching data: " + error.message);
+                showAuthScreen('screen-enter-pin'); // go back if fails
+            });
+        }
+
+        function save() {
+            if (!currentUserId) return;
+            // Push entire app state to Firestore
+            db.collection('users').doc(currentUserId).set(appState)
+                .catch((error) => {
+                    console.error("Error saving data: ", error);
+                    alert("Sync failed. Check connection.");
+                });
+        }
+
+        // --- 6. EXISTING APP LOGIC (Calculators, PDFs, UI updates) ---
 
         // Global Estimator (Plastering)
         function runAdvancedCalc() {
@@ -310,10 +485,9 @@
                 </div>`).join('');
         }
 
-        // Action Buttons Logic
         function openMap(addr) { 
             if(!addr || addr.trim() === 'undefined') return alert("No address saved!");
-            window.open(`https://maps.google.com/?q=${encodeURIComponent(addr)}`, '_blank'); 
+            window.open(`http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(addr)}`, '_blank'); 
         }
 
         function copyToClipboard(text) {
@@ -321,15 +495,12 @@
             navigator.clipboard.writeText(text); alert("Number copied to clipboard!");
         }
 
-        // GENERATE AND DOWNLOAD .ICS FILE
         function addToCalendar(id) {
             const j = appState.jobs.find(x => x.id === id);
             if(!j.dateFrom) return alert("Please set a start date in the job edit screen first.");
             
             const startStr = j.dateFrom.replace(/-/g,'');
             let endStr = startStr;
-            
-            // ICS all-day events require the end date to be the day AFTER the event finishes
             let endDate = new Date(j.dateTo || j.dateFrom);
             endDate.setDate(endDate.getDate() + 1);
             let yyyy = endDate.getFullYear();
@@ -340,13 +511,13 @@
             const icsData = [
                 "BEGIN:VCALENDAR",
                 "VERSION:2.0",
-                "PRODID:-//Megson Pro//App//EN",
+                "PRODID:-//Megson Plastering Hub//App//EN",
                 "BEGIN:VEVENT",
                 `DTSTART;VALUE=DATE:${startStr}`,
                 `DTEND;VALUE=DATE:${endStr}`,
                 `SUMMARY:${j.type}: ${j.client}`,
                 `LOCATION:${j.addr1 || ''} ${j.postcode || ''}`,
-                `DESCRIPTION:${j.notes || 'Job details inside Megson Pro'}`,
+                `DESCRIPTION:${j.notes || 'Job details inside Megson Plastering Hub'}`,
                 "END:VEVENT",
                 "END:VCALENDAR"
             ].join('\r\n');
@@ -431,7 +602,6 @@
             document.getElementById('edit-status').value = j.status || 'Not Started';
             document.getElementById('edit-notes').value = j.notes || '';
             
-            // Reset the in-project calc when opening
             document.getElementById('in-calc-mats').value = '';
             document.getElementById('in-calc-days').value = '';
             document.getElementById('in-calc-total').innerText = '£0.00';
@@ -482,33 +652,9 @@
             updateUIBranding(); save();
         }
 
-        // DATA MANAGEMENT
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
             const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", `megson_backup.json`); dl.click();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedState = JSON.parse(e.target.result);
-                    if(importedState && importedState.jobs) {
-                        appState = importedState;
-                        save(); // save to local storage
-                        init(); // re-initialize to map UI fields and jobs
-                        alert("Data successfully restored!");
-                    } else {
-                        alert("Invalid backup file format.");
-                    }
-                } catch (error) {
-                    alert("Error reading backup file.");
-                }
-                event.target.value = ''; // Reset input so you can select the same file again if needed
-            };
-            reader.readAsText(file);
         }
 
         function updateUIBranding() { document.getElementById('header-phone').innerText = appState.profile.phone; }
@@ -516,7 +662,6 @@
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
         function setFilter(s) { appState.filter = s; renderJobs(); document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active', 'text-white')); document.querySelector(`[data-status="${s}"]`).classList.add('active', 'text-white'); }
         
-        window.onload = init;
     </script>
 </body>
 </html>
